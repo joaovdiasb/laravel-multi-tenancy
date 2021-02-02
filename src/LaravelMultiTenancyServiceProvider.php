@@ -4,6 +4,7 @@ namespace Joaovdiasb\LaravelMultiTenancy;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
+use Joaovdiasb\LaravelMultiTenancy\Http\Middleware\TenancyChangeConnection;
 
 class LaravelMultiTenancyServiceProvider extends ServiceProvider
 {
@@ -15,8 +16,10 @@ class LaravelMultiTenancyServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/LaravelMultiTenancy.php', 'laravel-multi-tenancy');
-
         $this->publishConfig();
+
+        $router = $this->app->make(Router::class);
+        $router->aliasMiddleware('capitalize', TenancyChangeConnection::class);
 
         // $this->loadViewsFrom(__DIR__.'/resources/views', 'laravel-multi-tenancy');
         // $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
