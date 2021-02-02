@@ -1,0 +1,41 @@
+<?php
+
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
+
+class CreateTenancysTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('tenancys', function (Blueprint $table) {
+            $table->id();
+            $table->uuid('uuid');
+
+            $table->string('name')->nullable(false);
+            $table->string('reference')->unique()->nullable(false);
+            $table->string('db_host')->nullable(false);
+            $table->string('db_port')->nullable(false);
+            $table->string('db_database')->nullable(false);
+            $table->string('db_user')->nullable(false);
+            $table->text('db_password')->nullable(false);
+
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('tenancys');
+    }
+}

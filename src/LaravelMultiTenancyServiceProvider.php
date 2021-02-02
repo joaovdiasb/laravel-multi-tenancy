@@ -19,6 +19,15 @@ class LaravelMultiTenancyServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__ . '/../config/LaravelMultiTenancy.php', 'laravel-multi-tenancy');
         $this->publishConfig();
 
+        if ($this->app->runningInConsole()) {
+            // Export the migration
+            if (!class_exists('CreateTenancysTable')) {
+                $this->publishes([
+                    __DIR__ . '/../database/migrations/create_tenancys_table.php.stub' => database_path('migrations/tenancy/' . date('Y_m_d_His', time()) . '_create_tenancys_table.php'),
+                ], 'migrations');
+            }
+        }
+
         $router = $this->app->make(Router::class);
         $router->aliasMiddleware('tenancy', TenancyChangeConnection::class);
 
@@ -40,10 +49,10 @@ class LaravelMultiTenancyServiceProvider extends ServiceProvider
     }
 
     /**
-    * Get route group configuration array.
-    *
-    * @return array
-    */
+     * Get route group configuration array.
+     *
+     * @return array
+     */
     private function routeConfiguration()
     {
         return [
