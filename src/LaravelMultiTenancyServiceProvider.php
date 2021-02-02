@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Routing\Router;
 use Joaovdiasb\LaravelMultiTenancy\Http\Middleware\TenancyChangeConnection;
+use Illuminate\Contracts\Http\Kernel;
 
 class LaravelMultiTenancyServiceProvider extends ServiceProvider
 {
@@ -67,8 +68,13 @@ class LaravelMultiTenancyServiceProvider extends ServiceProvider
 
     public function routeMiddleware()
     {
+        $middlewareClass = TenancyChangeConnection::class;
+
         $router = $this->app->make(Router::class);
-        $router->aliasMiddleware('tenancy', TenancyChangeConnection::class);
+        $router->aliasMiddleware('tenancy', $middlewareClass);
+
+        $kernel = $this->app->make(Kernel::class);
+        $kernel->prependToMiddlewarePriority($middlewareClass);
     }
 
     /**

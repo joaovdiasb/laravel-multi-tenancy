@@ -36,13 +36,13 @@ class Tenancy extends Model
 
     public static function findFirstByKey(string $key, string $value)
     {
-        $tenant = self::where($key, $value)->first();
+        $tenancy = self::where($key, $value)->first();
 
-        if (!$tenant) {
+        if (!$tenancy) {
             throw new TenancyNotFoundException();
         }
 
-        return $tenant;
+        return $tenancy;
     }
 
     public function getDbPasswordAttribute($value): string
@@ -59,27 +59,27 @@ class Tenancy extends Model
         $this->attributes['db_password'] = $encrypter->encryptString($value);
     }
 
-    public function configure(): Tenant
+    public function configure(): Tenancy
     {
         config([
-            'database.connections.tenant.host' => $this->db_host,
-            'database.connections.tenant.port' => $this->db_port,
-            'database.connections.tenant.database' => $this->db_database,
-            'database.connections.tenant.user' => $this->db_user,
-            'database.connections.tenant.password' => $this->db_password,
+            'database.connections.tenancy.host' => $this->db_host,
+            'database.connections.tenancy.port' => $this->db_port,
+            'database.connections.tenancy.database' => $this->db_database,
+            'database.connections.tenancy.user' => $this->db_user,
+            'database.connections.tenancy.password' => $this->db_password,
             'filesystems.disks.local.root' => $this->reference
         ]);
 
-        DB::purge('tenant');
+        DB::purge('tenancy');
 
         return $this;
     }
 
-    public function use(): Tenant
+    public function use(): Tenancy
     {
-        app()->forgetInstance('tenant');
-
-        app()->instance('tenant', $this);
+        app()->forgetInstance('tenancy');
+        
+        app()->instance('tenancy', $this);
 
         return $this;
     }
