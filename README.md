@@ -1,4 +1,4 @@
-# laravel-multi-tenancy
+# Laravel multi-tenancy databases
 
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
 [![Travis](https://img.shields.io/travis/joaovdiasb/laravel-multi-tenancy.svg?style=flat-square)]()
@@ -14,8 +14,10 @@ composer require joaovdiasb/laravel-multi-tenancy
 
 ## Usage
 
-Write a few lines about the usage of this package.
-
+Publish migration file and migrate
+```bash
+php artisan vendor:publish --provider="Joaovdiasb\LaravelMultiTenancy\LaravelMultiTenancyServiceProvider" --tag="migrations" && php artisan migrate --path=./database/migrations/tenant
+```
 
 ## Testing
 
