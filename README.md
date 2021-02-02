@@ -5,19 +5,31 @@
 [![Total Downloads](https://img.shields.io/packagist/dt/joaovdiasb/laravel-multi-tenancy.svg?style=flat-square)](https://packagist.org/packages/joaovdiasb/laravel-multi-tenancy)
 
 
-## Install
+## Installation
 
+Install via composer
 ```bash
 composer require joaovdiasb/laravel-multi-tenancy
 ```
 
+## Configuration
+
+- Change .env with the tenancy database connection and ENCRYPT_KEY with 32 characters string.
+
+- Publish provider and migrate:
+```bash
+php artisan vendor:publish --provider="Joaovdiasb\LaravelMultiTenancy\LaravelMultiTenancyServiceProvider" && php artisan migrate --path=./database/migrations/tenant
+```
 
 ## Usage
+1. Add middleware *tenancy* on the routes that you need;
+2. Send *X-Ref* header on request with tenancy reference, defined on tenancys table.
 
-Publish migration file and migrate
-```bash
-php artisan vendor:publish --provider="Joaovdiasb\LaravelMultiTenancy\LaravelMultiTenancyServiceProvider" --tag="migrations" && php artisan migrate --path=./database/migrations/tenant
-```
+## Commands
+- Adding tenancy:
+- Migrating tenancy:
+- Seeding tenancy:
+- Backup tenancy:
 
 ## Testing
 

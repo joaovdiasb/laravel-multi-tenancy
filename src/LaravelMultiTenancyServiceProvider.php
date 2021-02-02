@@ -18,18 +18,8 @@ class LaravelMultiTenancyServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/LaravelMultiTenancy.php', 'laravel-multi-tenancy');
         $this->publishConfig();
-
-        if ($this->app->runningInConsole()) {
-            // Export the migration
-            if (!class_exists('CreateTenancysTable')) {
-                $this->publishes([
-                    __DIR__ . '/../database/migrations/create_tenancys_table.php.stub' => database_path('migrations/tenancy/' . date('Y_m_d_His', time()) . '_create_tenancys_table.php'),
-                ], 'migrations');
-            }
-        }
-
-        $router = $this->app->make(Router::class);
-        $router->aliasMiddleware('tenancy', TenancyChangeConnection::class);
+        $this->publishMigration();
+        $this->routeMiddleware();
 
         // $this->loadViewsFrom(__DIR__.'/resources/views', 'laravel-multi-tenancy');
         // $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
@@ -73,6 +63,28 @@ class LaravelMultiTenancyServiceProvider extends ServiceProvider
         $this->app->singleton('laravel-multi-tenancy', function () {
             return new LaravelMultiTenancy;
         });
+    }
+
+    public function routeMiddleware()
+    {
+        $router = $this->app->make(Router::class);
+        $router->aliasMiddleware('tenancy', TenancyChangeConnection::class);
+    }
+
+    /**
+     * Publish Migration
+     *
+     * @return void
+     */
+    public function publishMigration()
+    {
+        if ($this->app->runningInConsole()) {
+            if (!class_exists('\database\migrations\tenancy\CreateTenancysTable')) {
+                $this->publishes([
+                    __DIR__ . '/../database/migrations/create_tenancys_table.php.stub' => database_path('migrations/tenancy/' . date('Y_m_d_His', time()) . '_create_tenancys_table.php'),
+                ], 'migrations');
+            }
+        }
     }
 
     /**
