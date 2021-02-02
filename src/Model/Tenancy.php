@@ -47,14 +47,14 @@ class Tenancy extends Model
 
     public function getDbPasswordAttribute($value): string
     {
-        $encrypter = new Encrypter(config('app.encrypt_key'), 'AES-256-CBC');
+        $encrypter = new Encrypter(config('LaravelMultiTenancy.encrypt_key'), 'AES-256-CBC');
 
         return $encrypter->decryptString($value);
     }
 
     public function setDbPasswordAttribute($value): void
     {
-        $encrypter = new Encrypter(config('app.encrypt_key'), 'AES-256-CBC');
+        $encrypter = new Encrypter(config('LaravelMultiTenancy.encrypt_key'), 'AES-256-CBC');
 
         $this->attributes['db_password'] = $encrypter->encryptString($value);
     }
@@ -68,6 +68,22 @@ class Tenancy extends Model
             'database.connections.tenancy.user' => $this->db_user,
             'database.connections.tenancy.password' => $this->db_password,
             'filesystems.disks.local.root' => $this->reference
+        ]);
+
+        DB::purge('tenancy');
+
+        return $this;
+    }
+
+    public function configureManual(string $dbHost = null, string $dbPort = null, string $dbDatabase = null, string $dbUser = null, string $dbPassword = null, string $reference = null): Tenancy
+    {
+        config([
+            'database.connections.tenant.host' => $dbHost ?: $this->db_host,
+            'database.connections.tenant.port' => $dbPort ?: $this->db_port,
+            'database.connections.tenant.database' => $dbDatabase ?: $this->db_databas,
+            'database.connections.tenant.user' => $dbUser ?: $this->db_user,
+            'database.connections.tenant.password' => $dbPassword ?: $this->db_password,
+            'filesystems.disks.local.root' => $reference ?: $this->reference
         ]);
 
         DB::purge('tenancy');

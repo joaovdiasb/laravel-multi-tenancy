@@ -18,7 +18,7 @@ composer require joaovdiasb/laravel-multi-tenancy
 
 - Publish provider and migrate:
 ```bash
-php artisan vendor:publish --provider="Joaovdiasb\LaravelMultiTenancy\LaravelMultiTenancyServiceProvider" && php artisan migrate --path=./database/migrations/tenant
+php artisan vendor:publish --provider="Joaovdiasb\LaravelMultiTenancy\LaravelMultiTenancyServiceProvider" && php artisan migrate --path=./database/migrations/tenancy
 ```
 
 ## Usage

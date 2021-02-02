@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Routing\Router;
 use Joaovdiasb\LaravelMultiTenancy\Http\Middleware\TenancyChangeConnection;
 use Illuminate\Contracts\Http\Kernel;
+use Joaovdiasb\LaravelMultiTenancy\Console\TenancyAddCommand;
+use Joaovdiasb\LaravelMultiTenancy\Console\TenancyMigrateCommand;
 
 class LaravelMultiTenancyServiceProvider extends ServiceProvider
 {
@@ -21,6 +23,7 @@ class LaravelMultiTenancyServiceProvider extends ServiceProvider
         $this->publishConfig();
         $this->publishMigration();
         $this->routeMiddleware();
+        $this->registerCommands();
 
         // $this->loadViewsFrom(__DIR__.'/resources/views', 'laravel-multi-tenancy');
         // $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
@@ -66,7 +69,12 @@ class LaravelMultiTenancyServiceProvider extends ServiceProvider
         });
     }
 
-    public function routeMiddleware()
+    /**
+     * Route middleware.
+     *
+     * @return void
+     */
+    public function routeMiddleware(): void
     {
         $middlewareClass = TenancyChangeConnection::class;
 
@@ -78,14 +86,14 @@ class LaravelMultiTenancyServiceProvider extends ServiceProvider
     }
 
     /**
-     * Publish Migration
+     * Publish migration
      *
      * @return void
      */
-    public function publishMigration()
+    public function publishMigration(): void
     {
         if ($this->app->runningInConsole()) {
-            if (!class_exists('\database\migrations\tenancy\CreateTenancysTable')) {
+            if (!class_exists('app\database\migrations\tenancy\CreateTenancysTable')) {
                 $this->publishes([
                     __DIR__ . '/../database/migrations/create_tenancys_table.php.stub' => database_path('migrations/tenancy/' . date('Y_m_d_His', time()) . '_create_tenancys_table.php'),
                 ], 'migrations');
@@ -94,16 +102,31 @@ class LaravelMultiTenancyServiceProvider extends ServiceProvider
     }
 
     /**
-     * Publish Config
+     * Publish config
      *
      * @return void
      */
-    public function publishConfig()
+    public function publishConfig(): void
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([
                 __DIR__ . '/../config/LaravelMultiTenancy.php' => config_path('LaravelMultiTenancy.php'),
             ], 'config');
+        }
+    }
+
+    /**
+     * Register commands
+     *
+     * @return void
+     */
+    public function registerCommands(): void
+    {
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                TenancyAddCommand::class,
+                TenancyMigrateCommand::class
+            ]);
         }
     }
 }
