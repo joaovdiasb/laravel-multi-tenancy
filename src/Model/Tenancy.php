@@ -47,14 +47,14 @@ class Tenancy extends Model
 
     public function getDbPasswordAttribute($value): string
     {
-        $encrypter = new Encrypter(config('LaravelMultiTenancy.encrypt_key'), 'AES-256-CBC');
+        $encrypter = new Encrypter(config('tenancy.encrypt_key'), 'AES-256-CBC');
 
         return $encrypter->decryptString($value);
     }
 
     public function setDbPasswordAttribute($value): void
     {
-        $encrypter = new Encrypter(config('LaravelMultiTenancy.encrypt_key'), 'AES-256-CBC');
+        $encrypter = new Encrypter(config('tenancy.encrypt_key'), 'AES-256-CBC');
 
         $this->attributes['db_password'] = $encrypter->encryptString($value);
     }

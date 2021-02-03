@@ -71,7 +71,7 @@ class TenancyAddCommand extends Command
                 '--seed' => true
             ]);
 
-            if (config('LaravelMultiTenancy.passport')) {
+            if (config('tenancy.passport')) {
                 $this->call('passport:client', [
                     '--personal' => true,
                     '--no-interaction' => true

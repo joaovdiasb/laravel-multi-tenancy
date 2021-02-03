@@ -26,13 +26,29 @@ php artisan vendor:publish --provider="Joaovdiasb\LaravelMultiTenancy\LaravelMul
 2. Send *X-Ref* header on request with tenancy reference, defined on tenancys table.
 
 ## Commands
-- Adding tenancy:
-- Migrating tenancy:
-- Seeding tenancy:
+> If *tenancy* param is not present, all tenancys are selected
+
+- Add tenancy:
+```bash
+php artisan tenancy:add {name?} {reference?} {db_database?} {db_user?} {db_password?} {db_host?} {db_port?}
+```
+
+- Migrate tenancy:
+```bash
+php artisan tenancy:migrate {tenancy?} {--fresh} {--seed}
+```
+
+- Seed tenancy:
+```bash
+php artisan tenancy:seed {tenancy?} {--class=*}
+```
+
 - Backup tenancy:
+```bash
+php artisan tenancy:backup {tenancy?}
+```
 
 ## Testing
-
 Run the tests with:
 
 ```bash
