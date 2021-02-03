@@ -32,7 +32,7 @@ php artisan tenancy:add {name?} {reference?} {db_database?} {db_user?} {db_passw
 ```
 > **{reference?}** Used to pass on request header to identify tenancy
 
-> All params are optional, if not present, will be ask on console
+> All params are optional, if not present, will be asked on console
 
 - Migrate tenancy:
 ```bash
