@@ -31,6 +31,7 @@ php artisan vendor:publish --provider="Joaovdiasb\LaravelMultiTenancy\LaravelMul
 php artisan tenancy:add {name?} {reference?} {db_database?} {db_user?} {db_password?} {db_host?} {db_port?}
 ```
 > **{reference?}** Used to pass on request header to identify tenancy
+
 > All params are optional, if not present, will be ask on console
 
 - Migrate tenancy:
@@ -38,7 +39,9 @@ php artisan tenancy:add {name?} {reference?} {db_database?} {db_user?} {db_passw
 php artisan tenancy:migrate {tenancy?} {--fresh} {--seed}
 ```
 > **{tenancy?}** Select tenancy by id, if not present, all tenancys are selected
+
 > **{--fresh}** Is present, will drop all tables from the database
+
 > **{--seed}** Is present, call seeds
 
 - Seed tenancy:
@@ -46,6 +49,7 @@ php artisan tenancy:migrate {tenancy?} {--fresh} {--seed}
 php artisan tenancy:seed {tenancy?} {--class=*}
 ```
 > **{tenancy?}** Select tenancy by id, if is not present, all tenancys are selected
+
 > **{--class=*}** Is required, specify class name
 
 - Backup tenancy:
