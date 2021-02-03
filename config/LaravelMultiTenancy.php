@@ -1,5 +1,6 @@
 <?php
 
 return [
-    'encrypt_key' => env('ENCRYPT_KEY')
+    'encrypt_key' => env('ENCRYPT_KEY'),
+    'passport' => true
 ];

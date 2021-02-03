@@ -73,7 +73,7 @@ class TenancyMigrateCommand extends Command
                 $options
             );
 
-            if ($this->option('fresh')) {
+            if (config('LaravelMultiTenancy.passport') && $this->option('fresh')) {
                 $this->call('passport:client', [
                     '--personal' => true,
                     '--no-interaction' => true
