@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Joaovdiasb\LaravelMultiTenancy\Exceptions\TenancyNotFoundException;
+use Joaovdiasb\LaravelMultiTenancy\Exceptions\TenancyNotFound;
 
 class Tenancy extends Model
 {
@@ -39,7 +39,7 @@ class Tenancy extends Model
         $tenancy = self::where($key, $value)->first();
 
         if (!$tenancy) {
-            throw new TenancyNotFoundException();
+            throw new TenancyNotFound();
         }
 
         return $tenancy;
@@ -80,7 +80,7 @@ class Tenancy extends Model
         config([
             'database.connections.tenant.host' => $dbHost ?: $this->db_host,
             'database.connections.tenant.port' => $dbPort ?: $this->db_port,
-            'database.connections.tenant.database' => $dbDatabase ?: $this->db_databas,
+            'database.connections.tenant.database' => $dbDatabase ?: $this->db_database,
             'database.connections.tenant.user' => $dbUser ?: $this->db_user,
             'database.connections.tenant.password' => $dbPassword ?: $this->db_password,
             'filesystems.disks.local.root' => $reference ?: $this->reference

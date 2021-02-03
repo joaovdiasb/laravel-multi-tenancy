@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'encrypt_key' => env('ENCRYPT_KEY'),
+    'encrypt_key' => env('TENANCY_ENCRYPT_KEY'),
 
     'passport' => true,
 

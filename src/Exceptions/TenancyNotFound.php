@@ -5,7 +5,7 @@ namespace Joaovdiasb\LaravelMultiTenancy\Exceptions;
 use Exception;
 use Illuminate\Http\JsonResponse;
 
-class TenancyNotFoundException extends Exception
+class TenancyNotFound extends Exception
 {
     public function render(): JsonResponse
     {

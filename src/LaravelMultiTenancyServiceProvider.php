@@ -7,9 +7,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Routing\Router;
 use Joaovdiasb\LaravelMultiTenancy\Http\Middleware\TenancyChangeConnection;
 use Illuminate\Contracts\Http\Kernel;
-use Joaovdiasb\LaravelMultiTenancy\Console\TenancyAddCommand;
-use Joaovdiasb\LaravelMultiTenancy\Console\TenancyBackupCommand;
-use Joaovdiasb\LaravelMultiTenancy\Console\TenancyMigrateCommand;
+use Joaovdiasb\LaravelMultiTenancy\Console\{TenancyAddCommand, TenancyBackupCommand, TenancyMigrateCommand};
 
 class LaravelMultiTenancyServiceProvider extends ServiceProvider
 {
@@ -71,7 +69,7 @@ class LaravelMultiTenancyServiceProvider extends ServiceProvider
     }
 
     /**
-     * Route middleware.
+     * Add route middleware and set priority.
      *
      * @return void
      */
@@ -87,7 +85,7 @@ class LaravelMultiTenancyServiceProvider extends ServiceProvider
     }
 
     /**
-     * Publish migration
+     * Publish migration.
      *
      * @return void
      */
@@ -103,7 +101,7 @@ class LaravelMultiTenancyServiceProvider extends ServiceProvider
     }
 
     /**
-     * Publish config
+     * Publish config.
      *
      * @return void
      */
@@ -117,7 +115,7 @@ class LaravelMultiTenancyServiceProvider extends ServiceProvider
     }
 
     /**
-     * Register commands
+     * Register commands.
      *
      * @return void
      */
