@@ -8,6 +8,7 @@ use Illuminate\Routing\Router;
 use Joaovdiasb\LaravelMultiTenancy\Http\Middleware\TenancyChangeConnection;
 use Illuminate\Contracts\Http\Kernel;
 use Joaovdiasb\LaravelMultiTenancy\Console\TenancyAddCommand;
+use Joaovdiasb\LaravelMultiTenancy\Console\TenancyBackupCommand;
 use Joaovdiasb\LaravelMultiTenancy\Console\TenancyMigrateCommand;
 
 class LaravelMultiTenancyServiceProvider extends ServiceProvider
@@ -125,7 +126,8 @@ class LaravelMultiTenancyServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 TenancyAddCommand::class,
-                TenancyMigrateCommand::class
+                TenancyMigrateCommand::class,
+                TenancyBackupCommand::class
             ]);
         }
     }
