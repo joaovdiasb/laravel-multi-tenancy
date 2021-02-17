@@ -18,7 +18,7 @@ abstract class Database
 
     protected $dumpBinaryPath = '';
 
-    protected $compressor = null;
+    protected $compressor = false;
 
     protected $onlyStructure = false;
 

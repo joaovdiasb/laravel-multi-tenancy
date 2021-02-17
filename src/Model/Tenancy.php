@@ -59,21 +59,6 @@ class Tenancy extends Model
         $this->attributes['db_password'] = $encrypter->encryptString($value);
     }
 
-    public function getDbName(): string
-    {
-        return config('database.connections.tenancy.database');
-    }
-
-    public function getDbUser(): string
-    {
-        return config('database.connections.tenancy.user');
-    }
-
-    public function getDbPassword(): string
-    {
-        return config('database.connections.tenancy.password');
-    }
-
     private function configureTenancyFolder(string $reference): void
     {
         foreach (array_keys(config('filesystems.disks')) as $disk) {

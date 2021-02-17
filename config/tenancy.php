@@ -6,6 +6,7 @@ return [
     'backup' => [
         'temp_folder' => storage_path('app/backup-temp/'),
         'disks' => ['local'],
+        'compress' => true
     ],
 
     'passport' => false,

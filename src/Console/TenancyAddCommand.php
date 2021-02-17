@@ -39,7 +39,7 @@ class TenancyAddCommand extends Command
             'reference'   => $this->argument('reference') ?? $this->ask('Qual a nome da referência do tenancy?'),
             'db_host'     => $this->argument('db_host') ?? $this->ask('Qual o host do banco?', '127.0.0.1'),
             'db_port'     => $this->argument('db_port') ?? $this->ask('Qual a porta do banco?', '3306'),
-            'db_name' => $this->argument('db_name') ?? $this->ask('Qual o nome do banco?'),
+            'db_name'     => $this->argument('db_name') ?? $this->ask('Qual o nome do banco?'),
             'db_user'     => $this->argument('db_user') ?? $this->ask('Qual o nome do usuário do banco?'),
             'db_password' => $this->argument('db_password') ?? $this->ask('Qual a senha do banco?')
         ]);

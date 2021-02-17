@@ -55,19 +55,23 @@ class TenancyBackupCommand extends Command
             return $this->line('Operação cancelada');
         }
 
-        $fileName = date('Y_m_d_His', time()) . '.sql';
+        $fileName = date('Y_m_d_His', time()) . (config('tenancy.backup.compress') ? '.gz' : '.sql');
         $backupTempPath = config('tenancy.backup.temp_folder');
 
         if (!File::exists($backupTempPath)) {
             File::makeDirectory($backupTempPath, 0775, true, true);
         }
 
-        $mySql = MySql::create()
-            ->setDbName($tenancy->getDbName())
-            ->setDbUser($tenancy->getDbUser())
-            ->setDbPassword($tenancy->getDbPassword());
+        $conn = MySql::create()
+            ->setDbName($tenancy->db_name)
+            ->setDbUser($tenancy->db_user)
+            ->setDbPassword($tenancy->db_password);
 
-        $mySql->dumpToFile($backupTempFullPath = ($backupTempPath . $fileName));
+        if (config('tenancy.backup.compress')) {
+            $conn->setCompressor(true);
+        }
+
+        $conn->dumpToFile($backupTempFullPath = ($backupTempPath . $fileName));
 
         $this->info("Database dump finished » {$backupTempFullPath}");
 
