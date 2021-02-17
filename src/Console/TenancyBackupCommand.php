@@ -50,8 +50,8 @@ class TenancyBackupCommand extends Command
         $this->line("Backup Tenancy #{$tenancy->id} ({$tenancy->name})");
         $this->line('-------------------------------------------');
 
-        if (!$this->confirm('Tem certeza que deseja realmente continuar?')) {
-            return $this->line('Operação cancelada');
+        if (!$this->confirm('Are you sure you want to continue?')) {
+            return $this->line('Action canceled');
         }
 
         $fileName = date('Y_m_d_His', time()) . (config('tenancy.backup.compress') ? '.gz' : '.sql');
