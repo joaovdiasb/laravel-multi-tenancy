@@ -28,7 +28,7 @@ php artisan vendor:publish --provider="Joaovdiasb\LaravelMultiTenancy\LaravelMul
 ## Commands
 - Add tenancy:
 ```bash
-php artisan tenancy:add {name?} {reference?} {db_database?} {db_user?} {db_password?} {db_host?} {db_port?}
+php artisan tenancy:add {name?} {reference?} {db_name?} {db_user?} {db_password?} {db_host?} {db_port?}
 ```
 > **{reference?}** Used to pass on request header to identify tenancy
 

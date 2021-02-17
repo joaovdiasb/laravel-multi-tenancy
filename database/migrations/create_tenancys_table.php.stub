@@ -20,8 +20,8 @@ class CreateTenancysTable extends Migration
             $table->string('name')->nullable(false);
             $table->string('reference')->unique()->nullable(false);
             $table->string('db_host')->nullable(false);
-            $table->string('db_port')->nullable(false);
-            $table->string('db_database')->nullable(false);
+            $table->integer('db_port')->nullable(false);
+            $table->string('db_name')->nullable(false);
             $table->string('db_user')->nullable(false);
             $table->text('db_password')->nullable(false);
 

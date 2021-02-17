@@ -22,7 +22,7 @@ class Tenancy extends Model
         'reference',
         'db_host',
         'db_port',
-        'db_database',
+        'db_name',
         'db_user',
         'db_password'
     ];
@@ -59,15 +59,33 @@ class Tenancy extends Model
         $this->attributes['db_password'] = $encrypter->encryptString($value);
     }
 
+    public function getDbName(): string
+    {
+        return config('database.connections.tenancy.database');
+    }
+
+    public function getDbUser(): string
+    {
+        return config('database.connections.tenancy.user');
+    }
+
+    public function getDbPassword(): string
+    {
+        return config('database.connections.tenancy.password');
+    }
+
     public function configure(): Tenancy
     {
         config([
             'database.connections.tenancy.host' => $this->db_host,
             'database.connections.tenancy.port' => $this->db_port,
-            'database.connections.tenancy.database' => $this->db_database,
+            'database.connections.tenancy.database' => $this->db_name,
             'database.connections.tenancy.user' => $this->db_user,
             'database.connections.tenancy.password' => $this->db_password,
-            'filesystems.disks.local.root' => $this->reference
+            'filesystems.disks.' . config('tenancy.disks.local.name') . '.root' => 
+                config('filesystems.disks.' . config('tenancy.disks.local.name') . '.root') . $this->reference,
+            'filesystems.disks.' . config('tenancy.disks.backup.name') . '.root' => 
+                config('filesystems.disks.' . config('tenancy.disks.backup.name') . '.root') . $this->reference
         ]);
 
         DB::purge('tenancy');
@@ -80,10 +98,13 @@ class Tenancy extends Model
         config([
             'database.connections.tenant.host' => $dbHost ?: $this->db_host,
             'database.connections.tenant.port' => $dbPort ?: $this->db_port,
-            'database.connections.tenant.database' => $dbDatabase ?: $this->db_database,
+            'database.connections.tenant.database' => $dbDatabase ?: $this->db_name,
             'database.connections.tenant.user' => $dbUser ?: $this->db_user,
             'database.connections.tenant.password' => $dbPassword ?: $this->db_password,
-            'filesystems.disks.local.root' => $reference ?: $this->reference
+            'filesystems.disks.' . config('tenancy.disks.local.name') . '.root' => 
+                config('filesystems.disks.' . config('tenancy.disks.local.name') . '.root') . ($reference ?: $this->reference),
+            'filesystems.disks.' . config('tenancy.disks.backup.name') . '.root' => 
+                config('filesystems.disks.' . config('tenancy.disks.backup.name') . '.root') . ($reference ?: $this->reference)
         ]);
 
         DB::purge('tenancy');

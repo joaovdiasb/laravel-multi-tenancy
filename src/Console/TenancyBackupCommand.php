@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\App;
 use Joaovdiasb\LaravelMultiTenancy\Model\Tenancy;
 use Illuminate\Support\Facades\Storage;
+use Joaovdiasb\LaravelMultiTenancy\Utils\Database\MySql;
 
 class TenancyBackupCommand extends Command
 {
@@ -54,38 +55,30 @@ class TenancyBackupCommand extends Command
             return $this->line('Operação cancelada');
         }
 
-        $backupPath   = "backup/{$tenancy->reference}/" . date('d-m-Y-H-i-s', strtotime(now()));
-        $tableFile    = "{$backupPath}/tables.sql.gz";
-        $dataFile     = "{$backupPath}/data.sql.gz";
-        $ignoreTables = implode(
-            "--ignore-table={$tenancy->db_database}.",
-            []
-        );
+        $diskLocal = Storage::disk(config('tenancy.disks.local.name'));
+        $fileName = date('Y_m_d_His', time()) . '.sql';
+        $backupPath = $diskLocal->getAdapter()->getPathPrefix() . 'backup/';
 
-        if (!Storage::disk(config('tenancy.backup.disk1'))->exists($backupPath)) {
-            Storage::disk(config('tenancy.backup.disk1'))->makeDirectory($backupPath);
+        if (!$diskLocal->exists('backup')) {
+            $diskLocal->makeDirectory('backup');
         }
 
-        exec('mysqldump --host=' . escapeshellarg($tenancy->db_host) . ' -P ' . escapeshellarg($tenancy->db_port) . ' -u ' . escapeshellarg($tenancy->db_user) .
-            " --password='" . escapeshellarg($tenancy->db_password) . "' -d --skip-lock-tables " . escapeshellarg($tenancy->db_database) . ' | gzip > storage/app/' .
-            escapeshellarg($tableFile), $output);
+        $mySql = MySql::create()
+            ->setDbName($tenancy->getDbName())
+            ->setDbUser($tenancy->getDbUser())
+            ->setDbPassword($tenancy->getDbPassword());
 
-        $this->info(json_encode($output));
-        $this->info("Finalizado estrutura » storage/app/{$tableFile}");
+        $mySql->dumpToFile($backupFullPath = ($backupPath . $fileName));
 
-        exec('mysqldump --host=' . escapeshellarg($tenancy->db_host) . ' -P ' . escapeshellarg($tenancy->db_port) . ' -u ' . escapeshellarg($tenancy->db_user) .
-            " --password='" . escapeshellarg($tenancy->db_password) . "' --skip-lock-tables --no-create-info " . $ignoreTables . ' ' . escapeshellarg($tenancy->db_database) .
-            ' | gzip > storage/app/' . escapeshellarg($dataFile), $output);
+        $this->info("Database dump finished » {$backupFullPath}");
 
-        $this->info(json_encode($output));
-        $this->info("Finalizado dados » storage/app/{$dataFile}");
+        if (App::environment('production') && config('tenancy.disks.backup.allow_copy')) {
+            $diskBackup = Storage::disk(config('tenancy.disk.backup.name'));
+            $backupFullPath = $diskBackup->getAdapter()->getPathPrefix() . 'backup/' . $fileName;
 
-        if (App::environment('production') && config('tenancy.backup.disk2_allow_backup')) {
-            Storage::disk(config('tenancy.backup.disk2'))->put($backupPath, Storage::disk(config('tenancy.backup.disk2'))->get($tableFile));
-            $this->info("Salvando estrutura em cloud » {$tableFile}");
+            $diskBackup->put($backupPath, $diskLocal->get('backup/' . $fileName));
 
-            Storage::disk(config('tenancy.backup.disk2'))->put($backupPath, Storage::disk(config('tenancy.backup.disk2'))->get($dataFile));
-            $this->info("Salvando dados em cloud » {$dataFile}");
+            $this->info("Copying dump to backup disk » {$backupFullPath}");
         }
     }
 }
