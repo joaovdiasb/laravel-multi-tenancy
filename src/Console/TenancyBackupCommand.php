@@ -3,9 +3,9 @@
 namespace Joaovdiasb\LaravelMultiTenancy\Console;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\App;
+use File;
+use Storage;
 use Joaovdiasb\LaravelMultiTenancy\Model\Tenancy;
-use Illuminate\Support\Facades\Storage;
 use Joaovdiasb\LaravelMultiTenancy\Utils\Database\MySql;
 
 class TenancyBackupCommand extends Command
@@ -55,12 +55,11 @@ class TenancyBackupCommand extends Command
             return $this->line('Operação cancelada');
         }
 
-        $diskLocal = Storage::disk(config('tenancy.disks.local.name'));
         $fileName = date('Y_m_d_His', time()) . '.sql';
-        $backupPath = $diskLocal->getAdapter()->getPathPrefix() . 'backup/';
+        $backupTempPath = config('tenancy.backup.temp_folder');
 
-        if (!$diskLocal->exists('backup')) {
-            $diskLocal->makeDirectory('backup');
+        if (!File::exists($backupTempPath)) {
+            File::makeDirectory($backupTempPath, 0775, true, true);
         }
 
         $mySql = MySql::create()
@@ -68,17 +67,21 @@ class TenancyBackupCommand extends Command
             ->setDbUser($tenancy->getDbUser())
             ->setDbPassword($tenancy->getDbPassword());
 
-        $mySql->dumpToFile($backupFullPath = ($backupPath . $fileName));
+        $mySql->dumpToFile($backupTempFullPath = ($backupTempPath . $fileName));
 
-        $this->info("Database dump finished » {$backupFullPath}");
+        $this->info("Database dump finished » {$backupTempFullPath}");
 
-        if (App::environment('production') && config('tenancy.disks.backup.allow_copy')) {
-            $diskBackup = Storage::disk(config('tenancy.disk.backup.name'));
-            $backupFullPath = $diskBackup->getAdapter()->getPathPrefix() . 'backup/' . $fileName;
+        foreach (config('tenancy.backup.disks') as $disk) {
+            $backupPath = Storage::disk($disk)->getAdapter()->getPathPrefix();
 
-            $diskBackup->put($backupPath, $diskLocal->get('backup/' . $fileName));
+            if (!File::exists($backupPath)) {
+                File::makeDirectory($backupPath, 0775, true, true);
+            }
 
-            $this->info("Copying dump to backup disk » {$backupFullPath}");
+            File::put($backupFullPath = ($backupPath . $fileName), File::get($backupTempFullPath));
+            File::delete($backupTempFullPath);
+
+            $this->info("Copying backup disk [{$disk}] » {$backupFullPath}");
         }
     }
 }
