@@ -58,7 +58,7 @@ class TenancyBackupCommand extends Command
         $backupTempPath = config('tenancy.backup.temp_folder');
 
         if (!File::exists($backupTempPath)) {
-            File::makeDirectory($backupTempPath, 0775, true, true);
+            File::makeDirectory($backupTempPath, 0775);
         }
 
         $databaseTypes = [
@@ -84,7 +84,7 @@ class TenancyBackupCommand extends Command
             $backupPath = Storage::disk($disk)->getAdapter()->getPathPrefix();
 
             if (!File::exists($backupPath)) {
-                File::makeDirectory($backupPath, 0775, true, true);
+                File::makeDirectory($backupPath, 0775);
             }
 
             File::put($backupFullPath = ($backupPath . $fileName), File::get($backupTempFullPath));

@@ -13,6 +13,32 @@ class MySql extends Database
     $this->dbPort = 3306;
   }
 
+  public function getCreateDatabaseCommand(string $temporaryCredentialsFile): string
+  {
+    $quote = $this->determineQuote();
+
+    $command = [
+      "{$quote}mysql{$quote}",
+      "--defaults-extra-file=\"{$temporaryCredentialsFile}\"",
+      '-e "CREATE DATABASE ' . $this->getDbName() . ' CHARACTER SET utf8 COLLATE utf8_unicode_ci;"'
+    ];
+
+    return implode(' ', $command);
+  }
+
+  public function createDatabase()
+  {
+    $tempFileHandle = tmpfile();
+    $this->setTempFileHandle($tempFileHandle);
+
+    fwrite($this->getTempFileHandle(), $this->getContentsOfCredentialsFile());
+    $temporaryCredentialsFile = stream_get_meta_data($this->getTempFileHandle())['uri'];
+
+    $command = $this->getCreateDatabaseCommand($temporaryCredentialsFile);
+
+    Process::fromShellCommandline($command, null, null, null, $this->timeout)->run();
+  }
+
   public function getDumpCommand(string $dumpFile, string $temporaryCredentialsFile): string
   {
     $quote = $this->determineQuote();
@@ -41,9 +67,12 @@ class MySql extends Database
     $tempFileHandle = tmpfile();
     $this->setTempFileHandle($tempFileHandle);
 
-    $process = $this->getProcess($dumpFile);
+    fwrite($this->getTempFileHandle(), $this->getContentsOfCredentialsFile());
+    $temporaryCredentialsFile = stream_get_meta_data($this->getTempFileHandle())['uri'];
 
-    $process->run();
+    $command = $this->getDumpCommand($dumpFile, $temporaryCredentialsFile);
+
+    Process::fromShellCommandline($command, null, null, null, $this->timeout)->run();
   }
 
   public function getContentsOfCredentialsFile(): string
@@ -57,16 +86,6 @@ class MySql extends Database
     ];
 
     return implode(PHP_EOL, $contents);
-  }
-
-  public function getProcess(string $dumpFile): Process
-  {
-    fwrite($this->getTempFileHandle(), $this->getContentsOfCredentialsFile());
-    $temporaryCredentialsFile = stream_get_meta_data($this->getTempFileHandle())['uri'];
-
-    $command = $this->getDumpCommand($dumpFile, $temporaryCredentialsFile);
-
-    return Process::fromShellCommandline($command, null, null, null, $this->timeout);
   }
 
   public function getTempFileHandle()

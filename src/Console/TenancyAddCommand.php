@@ -31,30 +31,36 @@ class TenancyAddCommand extends Command
     {
         $this->line('');
         $this->line('-------------------------------------------');
-        $this->line('Adicionando Tenancy ' . $this->argument('name') ?: '');
+        $this->line('Adding Tenancy ' . $this->argument('name') ?: '');
         $this->line('-------------------------------------------');
 
         $tenancy = Tenancy::create([
-            'name'        => $this->argument('name') ?? $this->ask('Qual o nome do tenancy?'),
-            'reference'   => $this->argument('reference') ?? $this->ask('Qual a nome da referência do tenancy?'),
-            'db_host'     => $this->argument('db_host') ?? $this->ask('Qual o host do banco?', '127.0.0.1'),
-            'db_port'     => $this->argument('db_port') ?? $this->ask('Qual a porta do banco?', '3306'),
-            'db_name'     => $this->argument('db_name') ?? $this->ask('Qual o nome do banco?'),
-            'db_user'     => $this->argument('db_user') ?? $this->ask('Qual o nome do usuário do banco?'),
-            'db_password' => $this->argument('db_password') ?? $this->ask('Qual a senha do banco?')
+            'name'        => $this->argument('name') ?? $this->ask('What is the name of tenancy?'),
+            'reference'   => $this->argument('reference') ?? $this->ask('What is the reference of tenancy?'),
+            'db_host'     => $this->argument('db_host') ?? $this->ask('What is the host of database?', '127.0.0.1'),
+            'db_port'     => $this->argument('db_port') ?? $this->ask('What is the port of database?', '3306'),
+            'db_name'     => $this->argument('db_name') ?? $this->ask('What is the name of database?'),
+            'db_user'     => $this->argument('db_user') ?? $this->ask('What is the username of database?'),
+            'db_password' => $this->argument('db_password') ?? $this->ask('What is the password of database?')
         ]);
 
-        $this->info("Tenancy criado » #{$tenancy->id} ({$tenancy->name})");
+        $this->info("Tenancy created » #{$tenancy->id} ({$tenancy->name})");
 
         $oldConfig = config('database.connections.tenancy');
 
         try {
-            // DB::connection('tenancy')->statement("CREATE DATABASE {$tenancy->db_name} CHARACTER SET utf8 COLLATE utf8_unicode_ci");
-            exec('sudo mysql --host=' . escapeshellarg($tenancy->db_host) . ' -P ' . escapeshellarg($tenancy->db_port) .
-                ' -u ' . escapeshellarg($tenancy->db_user) .  " --password='" . escapeshellarg($tenancy->db_password) .
-                "' -e 'CREATE DATABASE " . escapeshellarg($tenancy->db_name) . " CHARACTER SET utf8 COLLATE utf8_unicode_ci'", $output);
+            $databaseTypes = [
+                'mysql' => 'MySql'
+            ];
+    
+            $databaseClass = '\Joaovdiasb\LaravelMultiTenancy\Utils\Database\\' . $databaseTypes[strtolower(config('tenancy.backup.database'))];
 
-            $this->info(json_encode($output));
+            str_replace("'", '', $databaseClass)::create()
+                ->setDbName($tenancy->db_name)
+                ->setDbUser($tenancy->db_user)
+                ->setDbPassword($tenancy->db_password)
+                ->createDatabase();
+
             $this->info("Database criada » {$tenancy->db_name}");
 
             $tenancy->configure()->use();

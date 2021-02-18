@@ -57,9 +57,9 @@ class TenancyMigrateCommand extends Command
             if (
                 App::environment('production') &&
                 Schema::hasTable('users') &&
-                !$this->confirm('O cliente possui informações, deseja realmente continuar?')
+                !$this->confirm('The client has data, are you sure you want to continue?')
             ) {
-                return $this->line('Operação cancelada.');
+                return $this->line('Action canceled');
             }
 
             $options = ['--force' => true];

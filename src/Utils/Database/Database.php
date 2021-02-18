@@ -105,23 +105,23 @@ abstract class Database
         return $this->isWindows() ? '"' : "'";
     }
 
-    protected function getCompressCommand(string $command, string $dumpFile): string
+    protected function getCompressCommand(string $command, string $dumpFilePath): string
     {
         if ($this->isWindows()) {
-            return "{$command} | gzip > {$dumpFile}";
+            return "{$command} | gzip > {$dumpFilePath}";
         }
 
-        return "(((({$command}; echo \$? >&3) | gzip > {$dumpFile}) 3>&1) | (read x; exit \$x))";
+        return "(((({$command}; echo \$? >&3) | gzip > {$dumpFilePath}) 3>&1) | (read x; exit \$x))";
     }
 
-    protected function echoToFile(string $command, string $dumpFile): string
+    protected function echoToFile(string $command, string $dumpFilePath): string
     {
-        $dumpFile = '"' . addcslashes($dumpFile, '\\"') . '"';
+        $dumpFilePath = '"' . addcslashes($dumpFilePath, '\\"') . '"';
 
         if ($this->compressor) {
-            return $this->getCompressCommand($command, $dumpFile);
+            return $this->getCompressCommand($command, $dumpFilePath);
         }
 
-        return $command . ' > ' . $dumpFile;
+        return $command . ' > ' . $dumpFilePath;
     }
 }
