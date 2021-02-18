@@ -12,6 +12,9 @@ class TenancyChangeConnection
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
+     * 
+     * @throws \Joaovdiasb\LaravelMultiTenancy\Exceptions\TenancyFail
+     * 
      * @return mixed
      */
     public function handle($request, Closure $next)

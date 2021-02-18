@@ -59,7 +59,7 @@ class TenancyMigrateCommand extends Command
                 Schema::hasTable('users') &&
                 !$this->confirm('The client has data, are you sure you want to continue?')
             ) {
-                return $this->line('Action canceled');
+                return $this->line('Action canceled.');
             }
 
             $options = ['--force' => true];

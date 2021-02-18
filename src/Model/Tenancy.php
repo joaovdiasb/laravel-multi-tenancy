@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Joaovdiasb\LaravelMultiTenancy\Exceptions\TenancyNotFound;
+use Joaovdiasb\LaravelMultiTenancy\Exceptions\TenancyFail;
 
 class Tenancy extends Model
 {
@@ -34,31 +34,62 @@ class Tenancy extends Model
         static::creating(fn ($model) => $model->uuid = Str::uuid());
     }
 
+    /**
+     * findFirstByKey
+     *
+     * @param string $key
+     * @param string $value
+     * 
+     * @throws TenancyFail
+     * 
+     * @return Tenancy
+     */
     public static function findFirstByKey(string $key, string $value)
     {
         $tenancy = self::where($key, $value)->first();
 
         if (!$tenancy) {
-            throw new TenancyNotFound();
+            throw TenancyFail::notFound($value);
         }
 
         return $tenancy;
     }
 
-    public function getDbPasswordAttribute($value): string
+    /**
+     * getDbPasswordAttribute
+     *
+     * @param string $value
+     * 
+     * @return string
+     */
+    public function getDbPasswordAttribute(string $value): string
     {
         $encrypter = new Encrypter(config('tenancy.encrypt_key'), 'AES-256-CBC');
 
         return $encrypter->decryptString($value);
     }
 
-    public function setDbPasswordAttribute($value): void
+    /**
+     * setDbPasswordAttribute
+     *
+     * @param string $value
+     * 
+     * @return void
+     */
+    public function setDbPasswordAttribute(string $value): void
     {
         $encrypter = new Encrypter(config('tenancy.encrypt_key'), 'AES-256-CBC');
 
         $this->attributes['db_password'] = $encrypter->encryptString($value);
     }
 
+    /**
+     * configureTenancyFolder
+     *
+     * @param string $reference
+     * 
+     * @return void
+     */
     private function configureTenancyFolder(string $reference): void
     {
         foreach (array_keys(config('filesystems.disks')) as $disk) {
@@ -68,6 +99,11 @@ class Tenancy extends Model
         };
     }
 
+    /**
+     * configure
+     *
+     * @return Tenancy
+     */
     public function configure(): Tenancy
     {
         config([
@@ -85,6 +121,18 @@ class Tenancy extends Model
         return $this;
     }
 
+    /**
+     * configureManual
+     *
+     * @param string $dbHost
+     * @param string $dbPort
+     * @param string $dbDatabase
+     * @param string $dbUser
+     * @param string $dbPassword
+     * @param string $reference
+     * 
+     * @return Tenancy
+     */
     public function configureManual(string $dbHost = null, string $dbPort = null, string $dbDatabase = null, string $dbUser = null, string $dbPassword = null, string $reference = null): Tenancy
     {
         config([
@@ -102,6 +150,11 @@ class Tenancy extends Model
         return $this;
     }
 
+    /**
+     * use
+     *
+     * @return Tenancy
+     */
     public function use(): Tenancy
     {
         app()->forgetInstance('tenancy');

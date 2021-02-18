@@ -94,7 +94,7 @@ class TenancyAddCommand extends Command
 
             $tenancy->delete();
 
-            $this->info('Houve um problema, tenancy removido.');
+            $this->info('There was a problem, tenancy removed.');
 
             return $this->info($e->getMessage());
         }

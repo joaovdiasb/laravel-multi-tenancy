@@ -4,24 +4,34 @@ namespace Joaovdiasb\LaravelMultiTenancy\Utils\Database;
 
 abstract class Database
 {
+    /** @var string **/
     protected $dbName;
 
+    /** @var string **/
     protected $dbUser;
 
+    /** @var string **/
     protected $dbPassword;
 
+    /** @var string **/
     protected $dbHost = 'localhost';
 
+    /** @var int **/
     protected $dbPort;
 
+    /** @var int **/
     protected $timeout = 0;
 
+    /** @var string **/
     protected $dumpBinaryPath = '';
 
+    /** @var bool **/
     protected $compressor = false;
 
+    /** @var bool **/
     protected $onlyStructure = false;
 
+    /** @var bool **/
     protected $onlyData = false;
 
     public static function create()
@@ -34,6 +44,11 @@ abstract class Database
         return $this->dbName;
     }
 
+    /**
+     * @param string $dbName
+     * 
+     * @return $this
+     */
     public function setDbName(string $dbName)
     {
         $this->dbName = $dbName;
@@ -41,6 +56,11 @@ abstract class Database
         return $this;
     }
 
+    /**
+     * @param string $dbUser
+     * 
+     * @return $this
+     */
     public function setDbUser(string $dbUser)
     {
         $this->dbUser = $dbUser;
@@ -48,6 +68,11 @@ abstract class Database
         return $this;
     }
 
+    /**
+     * @param string $dbPassword
+     * 
+     * @return $this
+     */
     public function setDbPassword(string $dbPassword)
     {
         $this->dbPassword = $dbPassword;
@@ -55,6 +80,11 @@ abstract class Database
         return $this;
     }
 
+    /**
+     * @param string $dbHost
+     * 
+     * @return $this
+     */
     public function setDbHost(string $dbHost)
     {
         $this->dbHost = $dbHost;
@@ -67,6 +97,11 @@ abstract class Database
         return $this->dbHost;
     }
 
+    /**
+     * @param string $dbPort
+     * 
+     * @return $this
+     */
     public function setDbPort(int $dbPort)
     {
         $this->dbPort = $dbPort;
@@ -74,6 +109,11 @@ abstract class Database
         return $this;
     }
 
+    /**
+     * @param string $compressor
+     * 
+     * @return $this
+     */
     public function setCompressor(string $compressor)
     {
         $this->compressor = $compressor;
@@ -81,6 +121,11 @@ abstract class Database
         return $this;
     }
 
+    /**
+     * @param string $onlyStructure
+     * 
+     * @return $this
+     */
     public function setOnlyStructure(bool $onlyStructure)
     {
         $this->onlyStructure = $onlyStructure;
@@ -88,6 +133,11 @@ abstract class Database
         return $this;
     }
 
+    /**
+     * @param string $onlyData
+     * 
+     * @return $this
+     */
     public function setOnlyData(bool $onlyData)
     {
         $this->onlyData = $onlyData;

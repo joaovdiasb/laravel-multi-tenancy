@@ -6,6 +6,7 @@ use Symfony\Component\Process\Process;
 
 class MySql extends Database
 {
+  /** @var false|resource */
   private $tempFileHandle;
 
   public function __construct()
@@ -13,6 +14,13 @@ class MySql extends Database
     $this->dbPort = 3306;
   }
 
+  /**
+   * getCreateDatabaseCommand
+   *
+   * @param string $temporaryCredentialsFile
+   * 
+   * @return string
+   */
   public function getCreateDatabaseCommand(string $temporaryCredentialsFile): string
   {
     $quote = $this->determineQuote();
@@ -36,9 +44,19 @@ class MySql extends Database
 
     $command = $this->getCreateDatabaseCommand($temporaryCredentialsFile);
 
-    Process::fromShellCommandline($command, null, null, null, $this->timeout)->run();
+    $process = Process::fromShellCommandline($command, null, null, null, $this->timeout);
+
+    $process->run();
   }
 
+  /**
+   * getDumpCommand
+   *
+   * @param string $dumpFilePath
+   * @param string $temporaryCredentialsFile
+   * 
+   * @return string
+   */
   public function getDumpCommand(string $dumpFilePath, string $temporaryCredentialsFile): string
   {
     $quote = $this->determineQuote();
@@ -72,7 +90,9 @@ class MySql extends Database
 
     $command = $this->getDumpCommand($dumpFilePath, $temporaryCredentialsFile);
 
-    Process::fromShellCommandline($command, null, null, null, $this->timeout)->run();
+    $process = Process::fromShellCommandline($command, null, null, null, $this->timeout);
+
+    $process->run();
   }
 
   public function getContentsOfCredentialsFile(): string
