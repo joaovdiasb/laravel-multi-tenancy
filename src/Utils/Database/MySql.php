@@ -39,7 +39,7 @@ class MySql extends Database
     Process::fromShellCommandline($command, null, null, null, $this->timeout)->run();
   }
 
-  public function getDumpCommand(string $dumpFile, string $temporaryCredentialsFile): string
+  public function getDumpCommand(string $dumpFilePath, string $temporaryCredentialsFile): string
   {
     $quote = $this->determineQuote();
 
@@ -59,10 +59,10 @@ class MySql extends Database
     
     $command[] = '--skip-lock-tables';
 
-    return $this->echoToFile(implode(' ', $command), $dumpFile);
+    return $this->echoToFile(implode(' ', $command), $dumpFilePath);
   }
 
-  public function dumpToFile(string $dumpFile)
+  public function dumpToFile(string $dumpFilePath)
   {
     $tempFileHandle = tmpfile();
     $this->setTempFileHandle($tempFileHandle);
@@ -70,7 +70,7 @@ class MySql extends Database
     fwrite($this->getTempFileHandle(), $this->getContentsOfCredentialsFile());
     $temporaryCredentialsFile = stream_get_meta_data($this->getTempFileHandle())['uri'];
 
-    $command = $this->getDumpCommand($dumpFile, $temporaryCredentialsFile);
+    $command = $this->getDumpCommand($dumpFilePath, $temporaryCredentialsFile);
 
     Process::fromShellCommandline($command, null, null, null, $this->timeout)->run();
   }
