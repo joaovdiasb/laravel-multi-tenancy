@@ -70,7 +70,9 @@ class TenancyBackupCommand extends Command
         $conn = str_replace("'", '', $databaseClass)::create()
             ->setDbName($tenancy->db_name)
             ->setDbUser($tenancy->db_user)
-            ->setDbPassword($tenancy->db_password);
+            ->setDbPassword($tenancy->db_password)
+            ->setDbHost($tenancy->db_host)
+            ->setDbPort($tenancy->db_port);
 
         if (config('tenancy.backup.compress')) {
             $conn->setCompressor(true);

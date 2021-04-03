@@ -35,13 +35,13 @@ class TenancyAddCommand extends Command
         $this->line('-------------------------------------------');
 
         $tenancy = Tenancy::create([
-            'name'        => $this->argument('name') ?? $this->ask('What is the name of tenancy?'),
-            'reference'   => $this->argument('reference') ?? $this->ask('What is the reference of tenancy?'),
-            'db_host'     => $this->argument('db_host') ?? $this->ask('What is the host of database?', '127.0.0.1'),
-            'db_port'     => $this->argument('db_port') ?? $this->ask('What is the port of database?', '3306'),
-            'db_name'     => $this->argument('db_name') ?? $this->ask('What is the name of database?'),
-            'db_user'     => $this->argument('db_user') ?? $this->ask('What is the username of database?'),
-            'db_password' => $this->argument('db_password') ?? $this->ask('What is the password of database?')
+            'name'        => $this->argument('name') ?? $this->ask('What is the name of connection?'),
+            'reference'   => $this->argument('reference') ?? $this->ask('What is the reference of connection?'),
+            'db_host'     => $this->argument('db_host') ?? $this->ask('What is the host of connection?', '127.0.0.1'),
+            'db_port'     => $this->argument('db_port') ?? $this->ask('What is the port of connection?', '3306'),
+            'db_name'     => $this->argument('db_name') ?? $this->ask('What is the database name of connection?'),
+            'db_user'     => $this->argument('db_user') ?? $this->ask('What is the username of connection?'),
+            'db_password' => $this->argument('db_password') ?? $this->ask('What is the password of connection?')
         ]);
 
         $this->info("Tenancy created » #{$tenancy->id} ({$tenancy->name})");
@@ -59,9 +59,11 @@ class TenancyAddCommand extends Command
                 ->setDbName($tenancy->db_name)
                 ->setDbUser($tenancy->db_user)
                 ->setDbPassword($tenancy->db_password)
+                ->setDbHost($tenancy->db_host)
+                ->setDbPort($tenancy->db_port)
                 ->createDatabase();
 
-            $this->info("Database criada » {$tenancy->db_name}");
+            $this->info("Database created » {$tenancy->db_name}");
 
             $tenancy->configure()->use();
 
