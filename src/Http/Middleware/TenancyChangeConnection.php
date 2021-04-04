@@ -13,7 +13,7 @@ class TenancyChangeConnection
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
      * 
-     * @throws \Joaovdiasb\LaravelMultiTenancy\Exceptions\TenancyFail
+     * @throws \Joaovdiasb\LaravelMultiTenancy\Exceptions\TenancyException
      * 
      * @return mixed
      */

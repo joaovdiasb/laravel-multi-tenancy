@@ -6,6 +6,7 @@ use File;
 use Storage;
 use Illuminate\Console\Command;
 use Joaovdiasb\LaravelMultiTenancy\Model\Tenancy;
+use Joaovdiasb\LaravelMultiTenancy\Utils\Database\Database;
 
 class TenancyBackupCommand extends Command
 {
@@ -61,13 +62,7 @@ class TenancyBackupCommand extends Command
             File::makeDirectory($backupTempPath, 0775);
         }
 
-        $databaseTypes = [
-            'mysql' => 'MySql'
-        ];
-
-        $databaseClass = '\Joaovdiasb\LaravelMultiTenancy\Utils\Database\\' . $databaseTypes[strtolower(config('tenancy.backup.database'))];
-
-        $conn = str_replace("'", '', $databaseClass)::create()
+        $conn = Database::getDatabaseTypeClass()::create()
             ->setDbName($tenancy->db_name)
             ->setDbUser($tenancy->db_user)
             ->setDbPassword($tenancy->db_password)

@@ -5,6 +5,7 @@ namespace Joaovdiasb\LaravelMultiTenancy\Console;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Joaovdiasb\LaravelMultiTenancy\Model\Tenancy;
+use Joaovdiasb\LaravelMultiTenancy\Utils\Database\Database;
 
 class TenancyAddCommand extends Command
 {
@@ -49,13 +50,7 @@ class TenancyAddCommand extends Command
         $oldConfig = config('database.connections.tenancy');
 
         try {
-            $databaseTypes = [
-                'mysql' => 'MySql'
-            ];
-    
-            $databaseClass = '\Joaovdiasb\LaravelMultiTenancy\Utils\Database\\' . $databaseTypes[strtolower(config('tenancy.backup.database'))];
-
-            str_replace("'", '', $databaseClass)::create()
+            Database::getDatabaseTypeClass()::create()
                 ->setDbName($tenancy->db_name)
                 ->setDbUser($tenancy->db_user)
                 ->setDbPassword($tenancy->db_password)

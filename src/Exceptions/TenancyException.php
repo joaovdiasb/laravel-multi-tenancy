@@ -4,12 +4,12 @@ namespace Joaovdiasb\LaravelMultiTenancy\Exceptions;
 
 use Exception;
 
-class TenancyFail extends Exception
+class TenancyException extends Exception
 {
     /**
      * @param string $value
      * 
-     * @return \Joaovdiasb\LaravelMultiTenancy\Exceptions\TenancyFail
+     * @return \Joaovdiasb\LaravelMultiTenancy\Exceptions\TenancyException
      */
     public static function notFound(string $name)
     {

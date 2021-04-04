@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Joaovdiasb\LaravelMultiTenancy\Exceptions\TenancyFail;
+use Joaovdiasb\LaravelMultiTenancy\Exceptions\TenancyException;
 
 class Tenancy extends Model
 {
@@ -40,7 +40,7 @@ class Tenancy extends Model
      * @param string $key
      * @param string $value
      * 
-     * @throws TenancyFail
+     * @throws TenancyException
      * 
      * @return Tenancy
      */
@@ -49,7 +49,7 @@ class Tenancy extends Model
         $tenancy = self::where($key, $value)->first();
 
         if (!$tenancy) {
-            throw TenancyFail::notFound($value);
+            throw TenancyException::notFound($value);
         }
 
         return $tenancy;
