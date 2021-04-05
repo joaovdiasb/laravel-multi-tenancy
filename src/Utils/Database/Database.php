@@ -36,7 +36,19 @@ abstract class Database
 
     public static function create()
     {
-        return new static();
+        $databaseTypes = [
+            'mysql' => 'MySql'
+        ];
+
+        $databaseType = strtolower(config('tenancy.backup.database'));
+
+        if (!isset($databaseTypes[$databaseType])) {
+            throw new \InvalidArgumentException('Invalid database type');
+        }
+
+        $databaseTypeClass = '\Joaovdiasb\LaravelMultiTenancy\Utils\Database\\' . $databaseTypes[$databaseType];
+
+        return new $databaseTypeClass;
     }
 
     public function getDbName(): string
@@ -143,21 +155,6 @@ abstract class Database
         $this->onlyData = $onlyData;
 
         return $this;
-    }
-
-    static function getDatabaseTypeClass()
-    {
-        $databaseTypes = [
-            'mysql' => 'MySql'
-        ];
-
-        $databaseType = strtolower(config('tenancy.backup.database'));
-
-        if (!isset($databaseTypes[$databaseType])) {
-            throw new \InvalidArgumentException('Invalid database type');
-        }
-
-        return '\Joaovdiasb\LaravelMultiTenancy\Utils\Database\\' . $databaseTypes[$databaseType];
     }
 
     protected function isWindows(): bool

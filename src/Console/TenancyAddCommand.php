@@ -50,7 +50,7 @@ class TenancyAddCommand extends Command
         $oldConfig = config('database.connections.tenancy');
 
         try {
-            Database::getDatabaseTypeClass()::create()
+            Database::create()
                 ->setDbName($tenancy->db_name)
                 ->setDbUser($tenancy->db_user)
                 ->setDbPassword($tenancy->db_password)

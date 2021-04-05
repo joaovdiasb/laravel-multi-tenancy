@@ -62,7 +62,7 @@ class TenancyBackupCommand extends Command
             File::makeDirectory($backupTempPath, 0775);
         }
 
-        $conn = Database::getDatabaseTypeClass()::create()
+        $conn = Database::create()
             ->setDbName($tenancy->db_name)
             ->setDbUser($tenancy->db_user)
             ->setDbPassword($tenancy->db_password)
