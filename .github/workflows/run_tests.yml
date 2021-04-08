@@ -21,7 +21,11 @@ jobs:
           options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
-    - uses: shivammathur/setup-php@b7d1d9c9a92d8d8463ce36d7f60da34d461724f8
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Setup PHP, with composer and extensions
+      uses: shivammathur/setup-php@abfbe6a46b637e038be212af3c5d3475b3e3213c
       with:
         php-version: '7.4'
         extensions: mbstring, dom, fileinfo, mysql
@@ -29,13 +33,11 @@ jobs:
     - name: Start mysql service
       run: sudo /etc/init.d/mysql start
 
-    - uses: actions/checkout@v2
-
     - name: Copy phpunit.xml.dist
       run: php -r "file_exists('phpunit.xml.dist') || copy('phpunit.xml.dist', 'phpunit.xml');"
 
     - name: Validate composer.json e composer.lock
-      run: composer validate
+      run: composer validate && composer dump
 
     - name: Install dependencys
       run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
