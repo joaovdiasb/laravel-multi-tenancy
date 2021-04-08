@@ -20,7 +20,7 @@ class TenancyAddCommandTest extends TestCase
       'reference'   => Str::random(10),
       'db_host'     => config('database.connections.tenancy.host'),
       'db_port'     => config('database.connections.tenancy.port'),
-      'db_name'     => 'test' . Str::random(6),
+      'db_name'     => 'test' . Str::uuid()->getHex(),
       'db_user'     => config('database.connections.tenancy.username'),
       'db_password' => config('database.connections.tenancy.password')
     ];
@@ -29,7 +29,6 @@ class TenancyAddCommandTest extends TestCase
   private function clearTest(Model $tenancy): void
   {
     DB::connection('tenancy')->statement("DROP DATABASE {$tenancy->db_name}");
-
     $tenancy->configureBack()->use();
   }
 

@@ -87,30 +87,27 @@ class TenancyAddCommand extends Command
                 ->setDbHost($tenancy->db_host)
                 ->setDbPort($tenancy->db_port)
                 ->createDatabase();
-
-            $this->info("Database created » {$tenancy->db_name}");
-
-            $exitCode = $this->call('tenancy:migrate', [
-                'tenancy' => $tenancy->id,
-                '--fresh' => true,
-                '--seed' => true
-            ]);
-
-            if ($exitCode === 1 && isset($tenancy)) {
-                $tenancy->delete();
-                $this->info('There was a problem, tenancy removed.');
-            }
-
-            return $exitCode;
         } catch (\Exception $e) {
-            if (isset($tenancy)) {
-                $tenancy->delete();
-                $this->info('There was a problem, tenancy removed.');
-            }
-
+            $tenancy->delete();
+            $this->info('There was a problem, tenancy removed.');
             $this->error($e->getMessage());
-
+            
             return 1;
         }
+
+        $this->info("Database created » {$tenancy->db_name}");
+
+        $exitCode = $this->call('tenancy:migrate', [
+            'tenancy' => $tenancy->id,
+            '--fresh' => true,
+            '--seed' => true
+        ]);
+
+        if ($exitCode === 1 && isset($tenancy)) {
+            $tenancy->delete();
+            $this->info('There was a problem, tenancy removed.');
+        }
+
+        return $exitCode;
     }
 }

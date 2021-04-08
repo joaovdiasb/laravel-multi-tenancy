@@ -60,7 +60,7 @@ class TenancySeedCommand extends Command
         $options
       );
     } catch (\Exception $e) {
-      $this->info($e->getMessage());
+      $this->error($e->getMessage());
     }
   }
 }
