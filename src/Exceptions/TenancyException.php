@@ -11,7 +11,7 @@ class TenancyException extends Exception
      * 
      * @return \Joaovdiasb\LaravelMultiTenancy\Exceptions\TenancyException
      */
-    public static function notFound(string $name)
+    public static function notFound(string $name): self
     {
         return new static("Tenancy {$name} not found.");
     }

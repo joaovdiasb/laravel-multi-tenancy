@@ -6,16 +6,15 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Joaovdiasb\LaravelMultiTenancy\Exceptions\TenancyException;
 
 class Tenancy extends Model
 {
-    use HasFactory;
-
     protected $table = 'tenancys';
 
     protected $connection = 'tenancy';
+
+    protected array $originalConnection = [];
 
     protected $fillable = [
         'name',
@@ -32,6 +31,16 @@ class Tenancy extends Model
         parent::boot();
 
         static::creating(fn ($model) => $model->uuid = Str::uuid());
+    }
+
+    /**
+     * getOriginalConnection
+     *
+     * @return array
+     */
+    public function getOriginalConnection(): array
+    {
+        return $this->originalConnection;
     }
 
     /**
@@ -106,11 +115,13 @@ class Tenancy extends Model
      */
     public function configure(): Tenancy
     {
+        $this->originalConnection = config('database.connections.tenancy') + ['reference' => $this->reference];
+
         config([
-            'database.connections.tenancy.host' => $this->db_host,
-            'database.connections.tenancy.port' => $this->db_port,
+            'database.connections.tenancy.host'     => $this->db_host,
+            'database.connections.tenancy.port'     => $this->db_port,
             'database.connections.tenancy.database' => $this->db_name,
-            'database.connections.tenancy.user' => $this->db_user,
+            'database.connections.tenancy.user'     => $this->db_user,
             'database.connections.tenancy.password' => $this->db_password
         ]);
 
@@ -122,28 +133,21 @@ class Tenancy extends Model
     }
 
     /**
-     * configureManual
+     * configureBack
      *
-     * @param string $dbHost
-     * @param string $dbPort
-     * @param string $dbDatabase
-     * @param string $dbUser
-     * @param string $dbPassword
-     * @param string $reference
-     * 
      * @return Tenancy
      */
-    public function configureManual(string $dbHost = null, string $dbPort = null, string $dbDatabase = null, string $dbUser = null, string $dbPassword = null, string $reference = null): Tenancy
+    public function configureBack(): Tenancy
     {
         config([
-            'database.connections.tenant.host' => $dbHost ?: $this->db_host,
-            'database.connections.tenant.port' => $dbPort ?: $this->db_port,
-            'database.connections.tenant.database' => $dbDatabase ?: $this->db_name,
-            'database.connections.tenant.user' => $dbUser ?: $this->db_user,
-            'database.connections.tenant.password' => $dbPassword ?: $this->db_password
+            'database.connections.tenancy.host'     => $this->originalConnection['host'],
+            'database.connections.tenancy.port'     => $this->originalConnection['port'],
+            'database.connections.tenancy.database' => $this->originalConnection['database'],
+            'database.connections.tenancy.user'     => $this->originalConnection['username'],
+            'database.connections.tenancy.password' => $this->originalConnection['password']
         ]);
 
-        $this->configureTenancyFolder($reference ?: $this->reference);
+        $this->configureTenancyFolder($this->originalConnection['reference']);
 
         DB::purge('tenancy');
 
@@ -158,7 +162,7 @@ class Tenancy extends Model
     public function use(): Tenancy
     {
         app()->forgetInstance('tenancy');
-        
+
         app()->instance('tenancy', $this);
 
         return $this;

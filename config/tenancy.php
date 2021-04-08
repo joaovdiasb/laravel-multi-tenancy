@@ -3,8 +3,9 @@
 return [
     'encrypt_key' => env('TENANCY_ENCRYPT_KEY'),
 
+    'database' => 'mysql',
+
     'backup' => [
-        'database' => 'mysql',
         'temp_folder' => storage_path('app/backup-temp/'),
         'disks' => ['local'],
         'compress' => true

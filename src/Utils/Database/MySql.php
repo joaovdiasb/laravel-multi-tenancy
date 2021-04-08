@@ -74,7 +74,7 @@ class MySql extends Database
     if ($this->onlyData) {
       $command[] = '--no-create-info';
     }
-    
+
     $command[] = '--skip-lock-tables';
 
     return $this->echoToFile(implode(' ', $command), $dumpFilePath);
@@ -108,6 +108,9 @@ class MySql extends Database
     return implode(PHP_EOL, $contents);
   }
 
+  /**
+   * @return false|resource
+   */
   public function getTempFileHandle()
   {
     return $this->tempFileHandle;

@@ -89,5 +89,7 @@ class TenancyBackupCommand extends Command
 
             $this->info("Copying to backup disk [{$disk}] » {$backupFullPath}");
         }
+
+        $tenancy->configureBack()->use();
     }
 }

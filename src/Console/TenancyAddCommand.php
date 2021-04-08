@@ -3,7 +3,7 @@
 namespace Joaovdiasb\LaravelMultiTenancy\Console;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 use Joaovdiasb\LaravelMultiTenancy\Model\Tenancy;
 use Joaovdiasb\LaravelMultiTenancy\Utils\Database\Database;
 
@@ -23,6 +23,37 @@ class TenancyAddCommand extends Command
      */
     protected $description = 'Tenancy add';
 
+    private function validate(array $data)
+    {
+        $validator = Validator::make($data, [
+            'name'        => 'required|string|between:3,128',
+            'reference'   => 'required|string|unique:tenancys|between:3,64',
+            'db_host'     => 'nullable|string|between:1,128',
+            'db_port'     => 'nullable|integer|between:1,10000',
+            'db_name'     => 'required|string|unique:tenancys|between:3,128',
+            'db_user'     => 'required|string|between:1,64',
+            'db_password' => 'required|string'
+        ]);
+
+        if ($validator->fails()) {
+            $this->info('Tenancy not created. See error messages below:');
+
+            foreach ($validator->errors()->all() as $error) {
+                $this->error($error);
+            }
+
+            return 1;
+        }
+    }
+
+    private function lineHeader(string $message): void
+    {
+        $this->line('');
+        $this->line('-------------------------------------------');
+        $this->line($message);
+        $this->line('-------------------------------------------');
+    }
+
     /**
      * Execute the console command.
      *
@@ -30,12 +61,7 @@ class TenancyAddCommand extends Command
      */
     public function handle()
     {
-        $this->line('');
-        $this->line('-------------------------------------------');
-        $this->line('Adding Tenancy ' . $this->argument('name') ?: '');
-        $this->line('-------------------------------------------');
-
-        $tenancy = Tenancy::create([
+        $data = [
             'name'        => $this->argument('name') ?? $this->ask('What is the name of connection?'),
             'reference'   => $this->argument('reference') ?? $this->ask('What is the reference of connection?'),
             'db_host'     => $this->argument('db_host') ?? $this->ask('What is the host of connection?', '127.0.0.1'),
@@ -43,11 +69,15 @@ class TenancyAddCommand extends Command
             'db_name'     => $this->argument('db_name') ?? $this->ask('What is the database name of connection?'),
             'db_user'     => $this->argument('db_user') ?? $this->ask('What is the username of connection?'),
             'db_password' => $this->argument('db_password') ?? $this->ask('What is the password of connection?')
-        ]);
+        ];
+
+        $this->validate($data);
+
+        $this->lineHeader('Adding Tenancy ' . $this->argument('name') ?: '');
+
+        $tenancy = Tenancy::create($data);
 
         $this->info("Tenancy created » #{$tenancy->id} ({$tenancy->name})");
-
-        $oldConfig = config('database.connections.tenancy');
 
         try {
             Database::create()
@@ -60,40 +90,27 @@ class TenancyAddCommand extends Command
 
             $this->info("Database created » {$tenancy->db_name}");
 
-            $tenancy->configure()->use();
-
-            $this->line('');
-            $this->line('-------------------------------------------');
-            $this->line("Migrating Tenancy #{$tenancy->id} ({$tenancy->name})");
-            $this->line('-------------------------------------------');
-
-            DB::connection('tenancy')->getDatabaseName();
-
-            $this->call('migrate:fresh', [
-                '--force' => true,
+            $exitCode = $this->call('tenancy:migrate', [
+                'tenancy' => $tenancy->id,
+                '--fresh' => true,
                 '--seed' => true
             ]);
 
-            if (config('tenancy.passport')) {
-                $this->call('passport:client', [
-                    '--personal' => true,
-                    '--no-interaction' => true
-                ]); 
+            if ($exitCode === 1 && isset($tenancy)) {
+                $tenancy->delete();
+                $this->info('There was a problem, tenancy removed.');
             }
+
+            return $exitCode;
         } catch (\Exception $e) {
-            $tenancy->configureManual(
-                $oldConfig['host'],
-                $oldConfig['port'],
-                $oldConfig['database'],
-                $oldConfig['username'],
-                $oldConfig['password']
-            )->use();
+            if (isset($tenancy)) {
+                $tenancy->delete();
+                $this->info('There was a problem, tenancy removed.');
+            }
 
-            $tenancy->delete();
+            $this->error($e->getMessage());
 
-            $this->info('There was a problem, tenancy removed.');
-
-            return $this->info($e->getMessage());
+            return 1;
         }
     }
 }

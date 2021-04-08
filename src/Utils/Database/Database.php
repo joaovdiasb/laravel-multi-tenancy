@@ -2,48 +2,47 @@
 
 namespace Joaovdiasb\LaravelMultiTenancy\Utils\Database;
 
+use Joaovdiasb\LaravelMultiTenancy\Exceptions\DatabaseException;
+
 abstract class Database
 {
-    /** @var string **/
-    protected $dbName;
+    protected string $dbName;
 
-    /** @var string **/
-    protected $dbUser;
+    protected string $dbUser;
 
-    /** @var string **/
-    protected $dbPassword;
+    protected string $dbPassword;
 
-    /** @var string **/
-    protected $dbHost = 'localhost';
+    protected string $dbHost = 'localhost';
 
-    /** @var int **/
-    protected $dbPort;
+    protected int $dbPort;
 
-    /** @var int **/
-    protected $timeout = 0;
+    protected int $timeout = 0;
 
-    /** @var string **/
-    protected $dumpBinaryPath = '';
+    protected string $dumpBinaryPath = '';
 
-    /** @var bool **/
-    protected $compressor = false;
+    protected bool $compressor = false;
 
-    /** @var bool **/
-    protected $onlyStructure = false;
+    protected bool $onlyStructure = false;
 
-    /** @var bool **/
-    protected $onlyData = false;
+    protected bool $onlyData = false;
 
+    /**
+     * Create database type instance
+     *
+     * @throws DatabaseException
+     * 
+     * @return mixed
+     */
     public static function create()
     {
         $databaseTypes = [
             'mysql' => 'MySql'
         ];
 
-        $databaseType = strtolower(config('tenancy.backup.database'));
+        $databaseType = strtolower(config('tenancy.database'));
 
         if (!isset($databaseTypes[$databaseType])) {
-            throw new \InvalidArgumentException('Invalid database type');
+            throw DatabaseException::invalidTypeConfig(config('tenancy.database'));
         }
 
         $databaseTypeClass = '\Joaovdiasb\LaravelMultiTenancy\Utils\Database\\' . $databaseTypes[$databaseType];
@@ -56,48 +55,28 @@ abstract class Database
         return $this->dbName;
     }
 
-    /**
-     * @param string $dbName
-     * 
-     * @return $this
-     */
-    public function setDbName(string $dbName)
+    public function setDbName(string $dbName): self
     {
         $this->dbName = $dbName;
 
         return $this;
     }
 
-    /**
-     * @param string $dbUser
-     * 
-     * @return $this
-     */
-    public function setDbUser(string $dbUser)
+    public function setDbUser(string $dbUser): self
     {
         $this->dbUser = $dbUser;
 
         return $this;
     }
 
-    /**
-     * @param string $dbPassword
-     * 
-     * @return $this
-     */
-    public function setDbPassword(string $dbPassword)
+    public function setDbPassword(string $dbPassword): self
     {
         $this->dbPassword = $dbPassword;
 
         return $this;
     }
 
-    /**
-     * @param string $dbHost
-     * 
-     * @return $this
-     */
-    public function setDbHost(string $dbHost)
+    public function setDbHost(string $dbHost): self
     {
         $this->dbHost = $dbHost;
 
@@ -109,48 +88,28 @@ abstract class Database
         return $this->dbHost;
     }
 
-    /**
-     * @param string $dbPort
-     * 
-     * @return $this
-     */
-    public function setDbPort(int $dbPort)
+    public function setDbPort(int $dbPort): self
     {
         $this->dbPort = $dbPort;
 
         return $this;
     }
 
-    /**
-     * @param string $compressor
-     * 
-     * @return $this
-     */
-    public function setCompressor(string $compressor)
+    public function setCompressor(string $compressor): self
     {
         $this->compressor = $compressor;
 
         return $this;
     }
 
-    /**
-     * @param string $onlyStructure
-     * 
-     * @return $this
-     */
-    public function setOnlyStructure(bool $onlyStructure)
+    public function setOnlyStructure(bool $onlyStructure): self
     {
         $this->onlyStructure = $onlyStructure;
 
         return $this;
     }
 
-    /**
-     * @param string $onlyData
-     * 
-     * @return $this
-     */
-    public function setOnlyData(bool $onlyData)
+    public function setOnlyData(bool $onlyData): self
     {
         $this->onlyData = $onlyData;
 

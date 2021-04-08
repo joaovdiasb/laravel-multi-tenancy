@@ -2,36 +2,50 @@
 
 namespace Joaovdiasb\LaravelMultiTenancy\Tests;
 
-use Joaovdiasb\LaravelMultiTenancy\LaravelMultiTenancyServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
+use Joaovdiasb\LaravelMultiTenancy\LaravelMultiTenancyServiceProvider;
 
 class TestCase extends BaseTestCase
 {
-    public function setup() : void
+    public function setup(): void
     {
         parent::setUp();
         $this->withoutExceptionHandling();
-        $this->artisan('migrate', ['--database' => 'testing']);
-
-        $this->loadMigrationsFrom(__DIR__ . '/../src/database/migrations');
-        $this->loadLaravelMigrations(['--database' => 'testing']);
-
-        $this->withFactories(__DIR__.'/../src/database/factories');
+        $this->setUpDatabase();
+        // $this->artisan('migrate', ['--database' => 'tenancy']);
+        // $this->loadMigrationsFrom(__DIR__ . '/../src/database/migrations');
+        // $this->loadLaravelMigrations(['--database' => 'tenancy']);
+        // $this->beforeApplicationDestroyed(function () {
+        //     $this->artisan('migrate:rollback');
+        // });
     }
 
     protected function getEnvironmentSetUp($app)
     {
-        $app['config']->set('app.key', 'AckfSECXIvnK5r28GVIWUAxmbBSjTsmF');
-        $app['config']->set('database.default', 'testing');
-        $app['config']->set('database.connections.testing', [
-            'driver'   => 'sqlite',
-            'database' => ':memory:',
-            'prefix'   => '',
+        $app->bind('DatabaseSeeder', 'Joaovdiasb\LaravelMultiTenancy\Tests\MockDatabaseSeeder');
+        $app['config']->set('tenancy', [
+            'encrypt_key' => '318654690878bef944a8b542ddb55d82',
+            'database'    => 'mysql'
+        ]);
+        $app['config']->set('database.connections.tenancy', [
+            'driver'   => env('DB_DRIVER'),
+            'database' => env('DB_DATABASE'),
+            'host'     => env('DB_HOST'),
+            'port'     => env('DB_PORT'),
+            'username' => env('DB_USERNAME'),
+            'password' => env('DB_PASSWORD')
         ]);
     }
 
     protected function getPackageProviders($app)
     {
         return [LaravelMultiTenancyServiceProvider::class];
+    }
+
+    protected function setUpDatabase()
+    {
+        include_once __DIR__ . '/../database/migrations/create_tenancys_table.php.stub';
+        (new \CreateTenancysTable())->down();
+        (new \CreateTenancysTable())->up();
     }
 }

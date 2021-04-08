@@ -28,25 +28,25 @@ class TenancySeedCommand extends Command
    */
   public function handle()
   {
-    if ($this->argument('tenant')) {
+    if ($this->argument('tenancy')) {
       $this->seed(
-        Tenancy::find($this->argument('tenant'))
+        Tenancy::find($this->argument('tenancy'))
       );
     } else {
       Tenancy::all()->each(
-        fn ($tenant) => $this->seed($tenant)
+        fn ($tenancy) => $this->seed($tenancy)
       );
     }
   }
 
-  public function seed($tenant)
+  public function seed($tenancy)
   {
     try {
-      $tenant->configure()->use();
+      $tenancy->configure()->use();
 
       $this->line('');
       $this->line('-------------------------------------------');
-      $this->line("Seeding Tenancy #{$tenant->id} ({$tenant->name})");
+      $this->line("Seeding Tenancy #{$tenancy->id} ({$tenancy->name})");
       $this->line('-------------------------------------------');
 
       $options = ['--force' => true];
