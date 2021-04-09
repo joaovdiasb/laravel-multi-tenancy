@@ -1,7 +1,7 @@
 # Laravel multi-tenancy databases
 
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
-[![Travis](https://img.shields.io/travis/joaovdiasb/laravel-multi-tenancy.svg?style=flat-square)]()
+[![CI](https://github.com/joaovdiasb/laravel-multi-tenancy/actions/workflows/run_tests.yml/badge.svg)]()
 [![Total Downloads](https://img.shields.io/packagist/dt/joaovdiasb/laravel-multi-tenancy.svg?style=flat-square)](https://packagist.org/packages/joaovdiasb/laravel-multi-tenancy)
 
 
