@@ -14,7 +14,7 @@ jobs:
       mysql:
         image: mysql:5.7
         env:
-          MYSQL_ROOT_PASSWORD: root
+          MYSQL_ALLOW_EMPTY_PASSWORD: root
           MYSQL_DATABASE: testing
         ports:
           - 3306/tcp
@@ -30,10 +30,8 @@ jobs:
         php-version: '7.4'
         extensions: mbstring, dom, fileinfo, mysql
 
-    - name: Start mysql service
-      run: sudo /etc/init.d/mysql start
-
-    - run: mysql -u root -proot -e "create database testing";
+    - name: Create database
+      run: mysql -u root -e "create database testing";
 
     - name: Copy phpunit.xml.dist
       run: php -r "file_exists('phpunit.xml.dist') || copy('phpunit.xml.dist', 'phpunit.xml');"
