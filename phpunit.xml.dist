@@ -15,7 +15,7 @@
     <env name="DB_CONNECTION" value="tenancy" force="true"/>
     <env name="DB_DRIVER" value="mysql" force="true"/>
     <env name="DB_DATABASE" value="testing_tenancy" force="true"/>
-    <env name="DB_HOST" value="mysql" force="true"/>
+    <env name="DB_HOST" value="127.0.0.1" force="true"/>
     <env name="DB_PORT" value="3306" force="true"/>
     <env name="DB_USERNAME" value="root" force="true"/>
     <env name="DB_PASSWORD" value="" force="true"/>

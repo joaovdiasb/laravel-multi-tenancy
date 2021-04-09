@@ -12,13 +12,13 @@ jobs:
 
     services:
       mysql:
-          image: mysql:5.7
-          env:
-            MYSQL_ALLOW_EMPTY_PASSWORD: yes
-            MYSQL_DATABASE: testing_tenancy
-          ports:
-            - 3306/tcp
-          options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+        image: mysql:5.7
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_DATABASE: testing_tenancy
+        ports:
+          - 3306/tcp
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
     - name: Checkout
@@ -37,7 +37,7 @@ jobs:
       run: php -r "file_exists('phpunit.xml.dist') || copy('phpunit.xml.dist', 'phpunit.xml');"
 
     - name: Validate composer.json e composer.lock
-      run: composer validate && composer dump
+      run: composer validate
 
     - name: Install dependencys
       run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
