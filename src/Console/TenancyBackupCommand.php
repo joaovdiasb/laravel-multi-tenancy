@@ -4,11 +4,10 @@ namespace Joaovdiasb\LaravelMultiTenancy\Console;
 
 use File;
 use Storage;
-use Illuminate\Console\Command;
 use Joaovdiasb\LaravelMultiTenancy\Model\Tenancy;
 use Joaovdiasb\LaravelMultiTenancy\Utils\Database\Database;
 
-class TenancyBackupCommand extends Command
+class TenancyBackupCommand extends BaseCommand
 {
     /**
      * The name and signature of the console command.
@@ -29,30 +28,32 @@ class TenancyBackupCommand extends Command
      *
      * @return int
      */
-    public function handle()
+    public function handle(): int
     {
-        if ($this->argument('tenancy')) {
-            $this->backup(
-                Tenancy::find($this->argument('tenancy'))
-            );
-        } else {
-            Tenancy::all()->each(
-                fn ($tenancy) => $this->backup($tenancy)
-            );
+        try {
+            $this->argument('tenancy')
+                ? $this->migrate(Tenancy::find($this->argument('tenancy')))
+                : Tenancy::all()->each(fn ($tenancy) => $this->migrate($tenancy));
+        } catch (\Exception $e) {
+            $this->tenancy->configureBack()->use();
+            $this->error($e->getMessage());
+
+            return 1;
         }
+
+        return 0;
     }
 
-    public function backup($tenancy)
+    public function backup($tenancy): void
     {
+        $this->tenancy = $tenancy;
+        
         $tenancy->configure()->use();
 
-        $this->line('');
-        $this->line('-------------------------------------------');
-        $this->line("Backup Tenancy #{$tenancy->id} ({$tenancy->name})");
-        $this->line('-------------------------------------------');
+        $this->lineHeader("Backup Tenancy #{$tenancy->id} ({$tenancy->name})");
 
         if (!$this->confirm('Are you sure you want to continue?')) {
-            return $this->line('Action canceled.');
+            throw new \Exception('Action canceled.');
         }
 
         $fileName = date('Y_m_d_His', time()) . (config('tenancy.backup.compress') ? '.gz' : '.sql');

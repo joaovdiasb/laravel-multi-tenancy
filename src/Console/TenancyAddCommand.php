@@ -2,12 +2,10 @@
 
 namespace Joaovdiasb\LaravelMultiTenancy\Console;
 
-use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Validator;
 use Joaovdiasb\LaravelMultiTenancy\Model\Tenancy;
 use Joaovdiasb\LaravelMultiTenancy\Utils\Database\Database;
 
-class TenancyAddCommand extends Command
+class TenancyAddCommand extends BaseCommand
 {
     /**
      * The name and signature of the console command.
@@ -23,43 +21,12 @@ class TenancyAddCommand extends Command
      */
     protected $description = 'Tenancy add';
 
-    private function validate(array $data)
-    {
-        $validator = Validator::make($data, [
-            'name'        => 'required|string|between:3,128',
-            'reference'   => 'required|string|unique:tenancys|between:3,64',
-            'db_host'     => 'nullable|string|between:1,128',
-            'db_port'     => 'nullable|integer|between:1,10000',
-            'db_name'     => 'required|string|unique:tenancys|between:3,128',
-            'db_user'     => 'required|string|between:1,64',
-            'db_password' => 'required|string'
-        ]);
-
-        if ($validator->fails()) {
-            $this->info('Tenancy not created. See error messages below:');
-
-            foreach ($validator->errors()->all() as $error) {
-                $this->error($error);
-            }
-
-            return 1;
-        }
-    }
-
-    private function lineHeader(string $message): void
-    {
-        $this->line('');
-        $this->line('-------------------------------------------');
-        $this->line($message);
-        $this->line('-------------------------------------------');
-    }
-
     /**
      * Execute the console command.
      *
      * @return int
      */
-    public function handle()
+    public function handle(): int
     {
         $data = [
             'name'        => $this->argument('name') ?? $this->ask('What is the name of connection?'),
@@ -71,7 +38,19 @@ class TenancyAddCommand extends Command
             'db_password' => $this->argument('db_password') ?? $this->ask('What is the password of connection?')
         ];
 
-        $this->validate($data);
+        $validation = [
+            'name'        => 'required|string|between:3,128',
+            'reference'   => 'required|string|unique:tenancys|between:3,64',
+            'db_host'     => 'nullable|string|between:1,128',
+            'db_port'     => 'nullable|integer|between:1,10000',
+            'db_name'     => 'required|string|unique:tenancys|between:3,128',
+            'db_user'     => 'required|string|between:1,64',
+            'db_password' => 'required|string'
+        ];
+
+        $validated = $this->validate($data, $validation);
+
+        if (!$validated) return 1;
 
         $this->lineHeader('Adding Tenancy ' . $this->argument('name') ?: '');
 
@@ -88,8 +67,11 @@ class TenancyAddCommand extends Command
                 ->setDbPort($tenancy->db_port)
                 ->createDatabase();
         } catch (\Exception $e) {
-            $tenancy->delete();
-            $this->info('There was a problem, tenancy removed.');
+            if (isset($tenancy)) {
+                $tenancy->delete();
+                $this->info('There was a problem on create database, tenancy removed.');
+            }
+            
             $this->error($e->getMessage());
             
             return 1;
@@ -105,7 +87,7 @@ class TenancyAddCommand extends Command
 
         if ($exitCode === 1 && isset($tenancy)) {
             $tenancy->delete();
-            $this->info('There was a problem, tenancy removed.');
+            $this->info('There was a problem on migrate, tenancy removed.');
         }
 
         return $exitCode;

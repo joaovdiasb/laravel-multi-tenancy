@@ -2,13 +2,12 @@
 
 namespace Joaovdiasb\LaravelMultiTenancy\Console;
 
-use Illuminate\Console\Command;
-use Illuminate\Support\Facades\{DB, Validator};
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Schema;
 use Joaovdiasb\LaravelMultiTenancy\Model\Tenancy;
 
-class TenancyMigrateCommand extends Command
+class TenancyMigrateCommand extends BaseCommand
 {
     /**
      * The name and signature of the console command.
@@ -29,18 +28,12 @@ class TenancyMigrateCommand extends Command
      *
      * @return int
      */
-    public function handle()
+    public function handle(): int
     {
         try {
-            if ($this->argument('tenancy')) {
-                $this->migrate(
-                    Tenancy::find($this->argument('tenancy'))
-                );
-            } else {
-                Tenancy::all()->each(
-                    fn ($tenancy) => $this->migrate($tenancy)
-                );
-            }
+            $this->argument('tenancy')
+                ? $this->migrate(Tenancy::find($this->argument('tenancy')))
+                : Tenancy::all()->each(fn ($tenancy) => $this->migrate($tenancy));
         } catch (\Exception $e) {
             $this->tenancy->configureBack()->use();
             $this->error($e->getMessage());
@@ -51,19 +44,11 @@ class TenancyMigrateCommand extends Command
         return 0;
     }
 
-    private function lineHeader(string $message): void
+    public function migrate($tenancy): void
     {
-        $this->line('');
-        $this->line('-------------------------------------------');
-        $this->line($message);
-        $this->line('-------------------------------------------');
-    }
-
-    public function migrate($tenancy)
-    {
-        $tenancy->configure()->use();
-
         $this->tenancy = $tenancy;
+
+        $tenancy->configure()->use();
 
         DB::connection('tenancy')->getDatabaseName();
 
@@ -71,10 +56,10 @@ class TenancyMigrateCommand extends Command
 
         if (
             App::environment('production') &&
-            Schema::hasTable('users') &&
+            Schema::hasTable('migrations') &&
             !$this->confirm('The client has data, are you sure you want to continue?')
         ) {
-            return $this->line('Action canceled.');
+            throw new \Exception('Action canceled.');
         }
 
         $options = ['--force' => true];

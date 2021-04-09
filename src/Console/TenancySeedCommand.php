@@ -3,9 +3,8 @@
 namespace App\Console\Commands;
 
 use App\Models\Tenancy;
-use Illuminate\Console\Command;
 
-class TenancySeedCommand extends Command
+class TenancySeedCommand extends BaseCommand
 {
   /**
    * The name and signature of the console command.
@@ -26,41 +25,39 @@ class TenancySeedCommand extends Command
    *
    * @return int
    */
-  public function handle()
+  public function handle(): int
   {
-    if ($this->argument('tenancy')) {
-      $this->seed(
-        Tenancy::find($this->argument('tenancy'))
-      );
-    } else {
-      Tenancy::all()->each(
-        fn ($tenancy) => $this->seed($tenancy)
-      );
+    try {
+      $this->argument('tenancy')
+        ? $this->migrate(Tenancy::find($this->argument('tenancy')))
+        : Tenancy::all()->each(fn ($tenancy) => $this->migrate($tenancy));
+    } catch (\Exception $e) {
+      $this->tenancy->configureBack()->use();
+      $this->error($e->getMessage());
+
+      return 1;
     }
+
+    return 0;
   }
 
   public function seed($tenancy)
   {
-    try {
-      $tenancy->configure()->use();
+    $this->tenancy = $tenancy;
 
-      $this->line('');
-      $this->line('-------------------------------------------');
-      $this->line("Seeding Tenancy #{$tenancy->id} ({$tenancy->name})");
-      $this->line('-------------------------------------------');
+    $tenancy->configure()->use();
 
-      $options = ['--force' => true];
+    $this->lineHeader("Seeding Tenancy #{$tenancy->id} ({$tenancy->name})");
 
-      if ($this->option('class')) {
-        $options['--class'] = $this->option('class')[0];
-      }
+    $options = ['--force' => true];
 
-      $this->call(
-        'db:seed',
-        $options
-      );
-    } catch (\Exception $e) {
-      $this->error($e->getMessage());
+    if ($this->option('class')) {
+      $options['--class'] = $this->option('class')[0];
     }
+
+    $this->call(
+      'db:seed',
+      $options
+    );
   }
 }
