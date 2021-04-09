@@ -33,6 +33,8 @@ jobs:
     - name: Start mysql service
       run: sudo /etc/init.d/mysql start
 
+    - run: mysql -u root -proot -e "create database testing";
+
     - name: Copy phpunit.xml.dist
       run: php -r "file_exists('phpunit.xml.dist') || copy('phpunit.xml.dist', 'phpunit.xml');"
 
