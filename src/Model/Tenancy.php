@@ -7,14 +7,15 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Database\Eloquent\Model;
 use Joaovdiasb\LaravelMultiTenancy\Exceptions\TenancyException;
+use Joaovdiasb\LaravelMultiTenancy\Traits\TenancyConfig;
 
 class Tenancy extends Model
 {
+    use TenancyConfig;
+    
     protected $table = 'tenancys';
 
-    protected $connection = 'tenancy';
-
-    protected array $originalConnection = [];
+    static protected array $beforeCurrentConnection = [];
 
     protected $fillable = [
         'name',
@@ -31,16 +32,6 @@ class Tenancy extends Model
         parent::boot();
 
         static::creating(fn ($model) => $model->uuid = Str::uuid());
-    }
-
-    /**
-     * getOriginalConnection
-     *
-     * @return array
-     */
-    public function getOriginalConnection(): array
-    {
-        return $this->originalConnection;
     }
 
     /**
@@ -64,13 +55,6 @@ class Tenancy extends Model
         return $tenancy;
     }
 
-    /**
-     * getDbPasswordAttribute
-     *
-     * @param string $value
-     * 
-     * @return string
-     */
     public function getDbPasswordAttribute(string $value): string
     {
         $encrypter = new Encrypter(config('tenancy.encrypt_key'), 'AES-256-CBC');
@@ -78,13 +62,6 @@ class Tenancy extends Model
         return $encrypter->decryptString($value);
     }
 
-    /**
-     * setDbPasswordAttribute
-     *
-     * @param string $value
-     * 
-     * @return void
-     */
     public function setDbPasswordAttribute(string $value): void
     {
         $encrypter = new Encrypter(config('tenancy.encrypt_key'), 'AES-256-CBC');
@@ -92,78 +69,77 @@ class Tenancy extends Model
         $this->attributes['db_password'] = $encrypter->encryptString($value);
     }
 
-    /**
-     * configureTenancyFolder
-     *
-     * @param string $reference
-     * 
-     * @return void
-     */
-    private function configureTenancyFolder(string $reference): void
+    public static function current(): ?self
+    {
+        $containerKey = config('tenancy.current_container_key');
+
+        if (!app()->has($containerKey)) {
+            return null;
+        }
+
+        return app($containerKey);
+    }
+
+    public static function existCurrent(): bool
+    {
+        return static::current() !== null;
+    }
+
+    public function isCurrent(): bool
+    {
+        return optional(static::current())->reference === $this->reference;
+    }
+
+    private function configureRootFolder(string $reference): void
     {
         foreach (array_keys(config('filesystems.disks')) as $disk) {
             config([
-                'filesystems.disks.' . $disk . '.root' => config('filesystems.disks.' . $disk . '.root') . $reference
+                "{filesystems.disks.{$disk}.root" => config("filesystems.disks.{$disk}.root") . $reference
             ]);
         };
     }
 
-    /**
-     * configure
-     *
-     * @return Tenancy
-     */
-    public function configure(): Tenancy
+    public function configure(): self
     {
-        $this->originalConnection = config('database.connections.tenancy') + ['reference' => $this->reference];
+        $this->beforeCurrentConnection = config($this->tenancyConnectionPath());
 
-        config([
-            'database.connections.tenancy.host'     => $this->db_host,
-            'database.connections.tenancy.port'     => $this->db_port,
-            'database.connections.tenancy.database' => $this->db_name,
-            'database.connections.tenancy.user'     => $this->db_user,
-            'database.connections.tenancy.password' => $this->db_password
-        ]);
+        config([$this->tenancyConnectionPath() => [
+            'driver'    => config($this->tenancyConnectionPath() . '.driver'),
+            'host'      => $this->db_host,
+            'port'      => $this->db_port,
+            'database'  => $this->db_name,
+            'username'  => $this->db_user,
+            'password'  => $this->db_password
+        ]]);
+        
+        $this->configureRootFolder($this->reference);
 
-        $this->configureTenancyFolder($this->reference);
-
-        DB::purge('tenancy');
+        DB::purge($this->tenancyConnectionName());
 
         return $this;
     }
 
-    /**
-     * configureBack
-     *
-     * @return Tenancy
-     */
-    public function configureBack(): Tenancy
+    public function configureBack(): self
     {
-        config([
-            'database.connections.tenancy.host'     => $this->originalConnection['host'],
-            'database.connections.tenancy.port'     => $this->originalConnection['port'],
-            'database.connections.tenancy.database' => $this->originalConnection['database'],
-            'database.connections.tenancy.user'     => $this->originalConnection['username'],
-            'database.connections.tenancy.password' => $this->originalConnection['password']
-        ]);
+        if (empty($this->beforeCurrentConnection)) {
+            return $this;
+        }
 
-        $this->configureTenancyFolder($this->originalConnection['reference']);
+        config([$this->tenancyConnectionPath() => $this->beforeCurrentConnection]);
 
-        DB::purge('tenancy');
+        $this->configureRootFolder($this->reference ?? '');
+
+        DB::purge($this->tenancyConnectionName());
 
         return $this;
     }
 
-    /**
-     * use
-     *
-     * @return Tenancy
-     */
-    public function use(): Tenancy
+    public function use(): self
     {
-        app()->forgetInstance('tenancy');
+        $containerKey = config('tenancy.current_container_key');
 
-        app()->instance('tenancy', $this);
+        app()->forgetInstance($containerKey);
+        app()->instance($containerKey, $this);
 
         return $this;
     }

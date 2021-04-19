@@ -25,7 +25,9 @@ class TestCase extends BaseTestCase
         $app->bind('DatabaseSeeder', 'Joaovdiasb\LaravelMultiTenancy\Tests\MockDatabaseSeeder');
         $app['config']->set('tenancy', [
             'encrypt_key' => '318654690878bef944a8b542ddb55d82',
-            'database'    => 'mysql'
+            'database'    => 'mysql',
+            'current_container_key' => 'currentTenancy',
+            'connection_name' => 'tenancy',
         ]);
         $app['config']->set('database.connections.tenancy', [
             'driver'   => env('DB_DRIVER'),

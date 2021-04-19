@@ -5,25 +5,29 @@
     "license": "MIT",
     "keywords": [
 		"laravel",
+        "saas",
 		"multi-tenancy",
+        "multi-tenant",
 		"tenancy"
 	],
     "authors": [
         {
-            "name": "Joao Victor Dias Bittencourt",
+            "name": "João Victor Dias Bittencourt",
             "email": "j.v_dias@hotmail.com"
         }
     ],
     "minimum-stability": "dev",
     "prefer-stable":true,
+    "require": {
+        "php": "^7.4"
+    },
     "require-dev": {
-        "fakerphp/faker": "^1.9@dev",
-        "illuminate/support": "^7.0@dev",
-        "mockery/mockery": "^1.0@dev",
+        "illuminate/support": "^7.0",
+        "mockery/mockery": "^1.0",
         "nunomaduro/collision": "^4.0",
-        "orchestra/database": "^5.0@dev",
-        "orchestra/testbench": "^5.0@dev",
-        "phpunit/phpunit": "9.4@dev",
+        "orchestra/database": "^5.0",
+        "orchestra/testbench": "^5.0",
+        "phpunit/phpunit": "9.4",
         "symfony/thanks": "^1.0"
     },
     "autoload": {
