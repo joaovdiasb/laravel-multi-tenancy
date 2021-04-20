@@ -73,7 +73,7 @@ class TenantMigrateCommand extends BaseCommand
             $options
         );
 
-        if (config('tenant.passport') && $this->option('fresh')) {
+        if (config('multitenancy.passport') && $this->option('fresh')) {
             $this->call('passport:client', [
                 '--personal' => true,
                 '--no-interaction' => true

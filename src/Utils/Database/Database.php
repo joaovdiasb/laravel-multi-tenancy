@@ -39,10 +39,10 @@ abstract class Database
             'mysql' => 'MySql'
         ];
 
-        $databaseType = strtolower(config('tenant.database'));
+        $databaseType = strtolower(config('multitenancy.database'));
 
         if (!isset($databaseTypes[$databaseType])) {
-            throw DatabaseException::invalidTypeConfig(config('tenant.database'));
+            throw DatabaseException::invalidTypeConfig(config('multitenancy.database'));
         }
 
         $databaseTypeClass = '\Joaovdiasb\LaravelMultiTenancy\Utils\Database\\' . $databaseTypes[$databaseType];

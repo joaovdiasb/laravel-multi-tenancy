@@ -17,11 +17,11 @@ abstract class TestCase extends Orchestra
     protected function getEnvironmentSetUp($app)
     {
         $app->bind('DatabaseSeeder', 'Joaovdiasb\LaravelMultiTenancy\Tests\MockDatabaseSeeder');
-        $app['config']->set('tenant', [
-            'encrypt_key' => '318654690878bef944a8b542ddb55d82',
-            'database'    => 'mysql',
-            'current_container_key' => 'currentTenant',
-            'tenant_connection_name' => 'tenant',
+        $app['config']->set('multitenancy', [
+            'encrypt_key'              => '318654690878bef944a8b542ddb55d82',
+            'database'                 => 'mysql',
+            'current_container_key'    => 'currentTenant',
+            'tenant_connection_name'   => 'tenant',
             'landlord_connection_name' => 'landlord',
         ]);
         $app['config']->set('database.connections.tenant', [

@@ -7,11 +7,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Database\Eloquent\Model;
 use Joaovdiasb\LaravelMultiTenancy\Exceptions\TenantException;
-use Joaovdiasb\LaravelMultiTenancy\Traits\TenantConfig;
+use Joaovdiasb\LaravelMultiTenancy\Traits\MultitenancyConfig;
 
 class Tenant extends Model
 {
-    use TenantConfig;
+    use MultitenancyConfig;
     
     protected $table = 'tenants';
 
@@ -57,21 +57,21 @@ class Tenant extends Model
 
     public function getDbPasswordAttribute(string $value): string
     {
-        $encrypter = new Encrypter(config('tenant.encrypt_key'), 'AES-256-CBC');
+        $encrypter = new Encrypter(config('multitenancy.encrypt_key'), 'AES-256-CBC');
 
         return $encrypter->decryptString($value);
     }
 
     public function setDbPasswordAttribute(string $value): void
     {
-        $encrypter = new Encrypter(config('tenant.encrypt_key'), 'AES-256-CBC');
+        $encrypter = new Encrypter(config('multitenancy.encrypt_key'), 'AES-256-CBC');
 
         $this->attributes['db_password'] = $encrypter->encryptString($value);
     }
 
     public static function current(): ?self
     {
-        $containerKey = config('tenant.current_container_key');
+        $containerKey = config('multitenancy.current_container_key');
 
         if (!app()->has($containerKey)) {
             return null;
@@ -136,7 +136,7 @@ class Tenant extends Model
 
     public function use(): self
     {
-        $containerKey = config('tenant.current_container_key');
+        $containerKey = config('multitenancy.current_container_key');
 
         app()->forgetInstance($containerKey);
         app()->instance($containerKey, $this);

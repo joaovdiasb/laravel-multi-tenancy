@@ -56,8 +56,8 @@ class TenantBackupCommand extends BaseCommand
             throw new \Exception('Action canceled.');
         }
 
-        $fileName = date('Y_m_d_His', time()) . (config('tenant.backup.compress') ? '.gz' : '.sql');
-        $backupTempPath = config('tenant.backup.temp_folder');
+        $fileName = date('Y_m_d_His', time()) . (config('multitenancy.backup.compress') ? '.gz' : '.sql');
+        $backupTempPath = config('multitenancy.backup.temp_folder');
 
         if (!File::exists($backupTempPath)) {
             File::makeDirectory($backupTempPath, 0775);
@@ -70,7 +70,7 @@ class TenantBackupCommand extends BaseCommand
             ->setDbHost($tenant->db_host)
             ->setDbPort($tenant->db_port);
 
-        if (config('tenant.backup.compress')) {
+        if (config('multitenancy.backup.compress')) {
             $conn->setCompressor(true);
         }
 
@@ -78,7 +78,7 @@ class TenantBackupCommand extends BaseCommand
 
         $this->info("Database dump finished » {$backupTempFullPath}");
 
-        foreach (config('tenant.backup.disks') as $disk) {
+        foreach (config('multitenancy.backup.disks') as $disk) {
             $backupPath = Storage::disk($disk)->getAdapter()->getPathPrefix();
 
             if (!File::exists($backupPath)) {

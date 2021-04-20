@@ -18,7 +18,7 @@ class LaravelMultiTenancyServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->mergeConfigFrom(__DIR__ . '/../config/tenant.php', 'laravel-multi-tenancy');
+        $this->mergeConfigFrom(__DIR__ . '/../config/multitenancy.php', 'laravel-multi-tenancy');
         $this->publishConfig();
         $this->publishMigration();
         $this->routeMiddleware();
@@ -109,7 +109,7 @@ class LaravelMultiTenancyServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__ . '/../config/tenant.php' => config_path('tenant.php'),
+                __DIR__ . '/../config/multitenancy.php' => config_path('multitenancy.php'),
             ], 'config');
         }
     }
