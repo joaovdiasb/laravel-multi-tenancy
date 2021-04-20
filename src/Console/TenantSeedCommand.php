@@ -2,23 +2,23 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Tenancy;
+use App\Models\Tenant;
 
-class TenancySeedCommand extends BaseCommand
+class TenantSeedCommand extends BaseCommand
 {
   /**
    * The name and signature of the console command.
    *
    * @var string
    */
-  protected $signature = 'tenancy:seed {tenancy?} {--class=*}';
+  protected $signature = 'tenant:seed {tenant?} {--class=*}';
 
   /**
    * The console command description.
    *
    * @var string
    */
-  protected $description = 'Tenancy seed';
+  protected $description = 'Tenant seed';
 
   /**
    * Execute the console command.
@@ -28,11 +28,11 @@ class TenancySeedCommand extends BaseCommand
   public function handle(): int
   {
     try {
-      $this->argument('tenancy')
-        ? $this->migrate(Tenancy::find($this->argument('tenancy')))
-        : Tenancy::all()->each(fn ($tenancy) => $this->migrate($tenancy));
+      $this->argument('tenant')
+        ? $this->migrate(Tenant::find($this->argument('tenant')))
+        : Tenant::all()->each(fn ($tenant) => $this->migrate($tenant));
     } catch (\Exception $e) {
-      $this->tenancy->configureBack()->use();
+      $this->tenant->configureBack()->use();
       $this->error($e->getMessage());
 
       return 1;
@@ -41,13 +41,13 @@ class TenancySeedCommand extends BaseCommand
     return 0;
   }
 
-  public function seed($tenancy)
+  public function seed($tenant)
   {
-    $this->tenancy = $tenancy;
+    $this->tenant = $tenant;
 
-    $tenancy->configure()->use();
+    $tenant->configure()->use();
 
-    $this->lineHeader("Seeding Tenancy #{$tenancy->id} ({$tenancy->name})");
+    $this->lineHeader("Seeding Tenant #{$tenant->id} ({$tenant->name})");
 
     $options = ['--force' => true];
 

@@ -5,23 +5,23 @@ namespace Joaovdiasb\LaravelMultiTenancy\Console;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Schema;
-use Joaovdiasb\LaravelMultiTenancy\Model\Tenancy;
+use Joaovdiasb\LaravelMultiTenancy\Model\Tenant;
 
-class TenancyMigrateCommand extends BaseCommand
+class TenantMigrateCommand extends BaseCommand
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'tenancy:migrate {tenancy?} {--fresh} {--seed}';
+    protected $signature = 'tenant:migrate {tenant?} {--fresh} {--seed}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Tenancy migrate';
+    protected $description = 'Tenant migrate';
 
     /**
      * Execute the console command.
@@ -31,11 +31,11 @@ class TenancyMigrateCommand extends BaseCommand
     public function handle(): int
     {
         try {
-            $this->argument('tenancy')
-                ? $this->migrate(Tenancy::find($this->argument('tenancy')))
-                : Tenancy::all()->each(fn ($tenancy) => $this->migrate($tenancy));
+            $this->argument('tenant')
+                ? $this->migrate(Tenant::find($this->argument('tenant')))
+                : Tenant::all()->each(fn ($tenant) => $this->migrate($tenant));
         } catch (\Exception $e) {
-            $this->tenancy->configureBack()->use();
+            $this->tenant->configureBack()->use();
             $this->error($e->getMessage());
 
             return 1;
@@ -44,15 +44,15 @@ class TenancyMigrateCommand extends BaseCommand
         return 0;
     }
 
-    public function migrate($tenancy): void
+    public function migrate($tenant): void
     {
-        $this->tenancy = $tenancy;
+        $this->tenant = $tenant;
 
-        $tenancy->configure()->use();
+        $tenant->configure()->use();
 
-        DB::connection('tenancy')->getDatabaseName();
+        DB::connection('tenant')->getDatabaseName();
 
-        $this->lineHeader("Migrating Tenancy #{$tenancy->id} ({$tenancy->name})");
+        $this->lineHeader("Migrating Tenant #{$tenant->id} ({$tenant->name})");
 
         if (
             App::environment('production') &&
@@ -73,13 +73,13 @@ class TenancyMigrateCommand extends BaseCommand
             $options
         );
 
-        if (config('tenancy.passport') && $this->option('fresh')) {
+        if (config('tenant.passport') && $this->option('fresh')) {
             $this->call('passport:client', [
                 '--personal' => true,
                 '--no-interaction' => true
             ]);
         }
 
-        $tenancy->configureBack()->use();
+        $tenant->configureBack()->use();
     }
 }

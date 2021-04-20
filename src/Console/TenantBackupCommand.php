@@ -4,24 +4,24 @@ namespace Joaovdiasb\LaravelMultiTenancy\Console;
 
 use File;
 use Storage;
-use Joaovdiasb\LaravelMultiTenancy\Model\Tenancy;
+use Joaovdiasb\LaravelMultiTenancy\Model\Tenant;
 use Joaovdiasb\LaravelMultiTenancy\Utils\Database\Database;
 
-class TenancyBackupCommand extends BaseCommand
+class TenantBackupCommand extends BaseCommand
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'tenancy:backup {tenancy?}';
+    protected $signature = 'tenant:backup {tenant?}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Tenancy backup';
+    protected $description = 'Tenant backup';
 
     /**
      * Execute the console command.
@@ -31,11 +31,11 @@ class TenancyBackupCommand extends BaseCommand
     public function handle(): int
     {
         try {
-            $this->argument('tenancy')
-                ? $this->migrate(Tenancy::find($this->argument('tenancy')))
-                : Tenancy::all()->each(fn ($tenancy) => $this->migrate($tenancy));
+            $this->argument('tenant')
+                ? $this->migrate(Tenant::find($this->argument('tenant')))
+                : Tenant::all()->each(fn ($tenant) => $this->migrate($tenant));
         } catch (\Exception $e) {
-            $this->tenancy->configureBack()->use();
+            $this->tenant->configureBack()->use();
             $this->error($e->getMessage());
 
             return 1;
@@ -44,33 +44,33 @@ class TenancyBackupCommand extends BaseCommand
         return 0;
     }
 
-    public function backup($tenancy): void
+    public function backup($tenant): void
     {
-        $this->tenancy = $tenancy;
+        $this->tenant = $tenant;
         
-        $tenancy->configure()->use();
+        $tenant->configure()->use();
 
-        $this->lineHeader("Backup Tenancy #{$tenancy->id} ({$tenancy->name})");
+        $this->lineHeader("Backup Tenant #{$tenant->id} ({$tenant->name})");
 
         if (!$this->confirm('Are you sure you want to continue?')) {
             throw new \Exception('Action canceled.');
         }
 
-        $fileName = date('Y_m_d_His', time()) . (config('tenancy.backup.compress') ? '.gz' : '.sql');
-        $backupTempPath = config('tenancy.backup.temp_folder');
+        $fileName = date('Y_m_d_His', time()) . (config('tenant.backup.compress') ? '.gz' : '.sql');
+        $backupTempPath = config('tenant.backup.temp_folder');
 
         if (!File::exists($backupTempPath)) {
             File::makeDirectory($backupTempPath, 0775);
         }
 
         $conn = Database::create()
-            ->setDbName($tenancy->db_name)
-            ->setDbUser($tenancy->db_user)
-            ->setDbPassword($tenancy->db_password)
-            ->setDbHost($tenancy->db_host)
-            ->setDbPort($tenancy->db_port);
+            ->setDbName($tenant->db_name)
+            ->setDbUser($tenant->db_user)
+            ->setDbPassword($tenant->db_password)
+            ->setDbHost($tenant->db_host)
+            ->setDbPort($tenant->db_port);
 
-        if (config('tenancy.backup.compress')) {
+        if (config('tenant.backup.compress')) {
             $conn->setCompressor(true);
         }
 
@@ -78,7 +78,7 @@ class TenancyBackupCommand extends BaseCommand
 
         $this->info("Database dump finished » {$backupTempFullPath}");
 
-        foreach (config('tenancy.backup.disks') as $disk) {
+        foreach (config('tenant.backup.disks') as $disk) {
             $backupPath = Storage::disk($disk)->getAdapter()->getPathPrefix();
 
             if (!File::exists($backupPath)) {
@@ -91,6 +91,6 @@ class TenancyBackupCommand extends BaseCommand
             $this->info("Copying to backup disk [{$disk}] » {$backupFullPath}");
         }
 
-        $tenancy->configureBack()->use();
+        $tenant->configureBack()->use();
     }
 }

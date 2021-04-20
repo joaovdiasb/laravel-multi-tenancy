@@ -13,50 +13,49 @@ composer require joaovdiasb/laravel-multi-tenancy
 ```
 
 ## Configuration
-
-- Change .env with the tenancy database connection and add TENANCY_ENCRYPT_KEY with 32 random characters string.
-
-- Publish provider and migrate:
+1. Publish provider and migrate:
 ```bash
-php artisan vendor:publish --provider="Joaovdiasb\LaravelMultiTenancy\LaravelMultiTenancyServiceProvider" && php artisan migrate --path=./database/migrations/tenancy
+php artisan vendor:publish --provider="Joaovdiasb\LaravelMultiTenancy\LaravelMultiTenancyServiceProvider" && php artisan migrate --path=./database/migrations/tenant
 ```
+2. Define connections on published config called tenant;
+3. Add TENANCY_ENCRYPT_KEY with 32 random characters string.
 
 ## Usage
-1. Add middleware *tenancy* on the routes that you need;
-2. Send *X-Ref* header on request with tenancy reference, defined on tenancys table.
+1. Add middleware *multitenancy* on the routes that you need;
+2. Send *X-Ref* header on request with tenant reference, defined on tenants table.
 
 ## Commands
-- Add tenancy:
+- Add tenant:
 ```bash
-php artisan tenancy:add {name?} {reference?} {db_name?} {db_user?} {db_password?} {db_host?} {db_port?}
+php artisan tenant:add {name?} {reference?} {db_name?} {db_user?} {db_password?} {db_host?} {db_port?}
 ```
-> **{reference?}** Used to pass on request header to identify tenancy
+> **{reference?}** Used to pass on request header to identify tenant
 
 > All params are optional, if not present, will be asked on console
 
-- Migrate tenancy:
+- Migrate tenant:
 ```bash
-php artisan tenancy:migrate {tenancy?} {--fresh} {--seed}
+php artisan tenant:migrate {tenant?} {--fresh} {--seed}
 ```
-> **{tenancy?}** Select tenancy by id, if not present, all tenancys are selected
+> **{tenant?}** Select tenant by id, if not present, all tenants are selected
 
 > **{--fresh}** Is present, will drop all tables from the database
 
 > **{--seed}** Is present, call seeds
 
-- Seed tenancy:
+- Seed tenant:
 ```bash
-php artisan tenancy:seed {tenancy?} {--class=*}
+php artisan tenant:seed {tenant?} {--class=*}
 ```
-> **{tenancy?}** Select tenancy by id, if is not present, all tenancys are selected
+> **{tenant?}** Select tenant by id, if is not present, all tenants are selected
 
 > **{--class=*}** Is required, specify class name
 
-- Backup tenancy:
+- Backup tenant:
 ```bash
-php artisan tenancy:backup {tenancy?}
+php artisan tenant:backup {tenant?}
 ```
-> **{tenancy?}** Select tenancy by id, if is not present, all tenancys are selected
+> **{tenant?}** Select tenant by id, if is not present, all tenants are selected
 
 ## Testing
 Run the tests with:

@@ -2,24 +2,24 @@
 
 namespace Joaovdiasb\LaravelMultiTenancy\Console;
 
-use Joaovdiasb\LaravelMultiTenancy\Model\Tenancy;
+use Joaovdiasb\LaravelMultiTenancy\Model\Tenant;
 use Joaovdiasb\LaravelMultiTenancy\Utils\Database\Database;
 
-class TenancyAddCommand extends BaseCommand
+class TenantAddCommand extends BaseCommand
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'tenancy:add {name?} {reference?} {db_name?} {db_user?} {db_password?} {db_host?} {db_port?}';
+    protected $signature = 'tenant:add {name?} {reference?} {db_name?} {db_user?} {db_password?} {db_host?} {db_port?}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Tenancy add';
+    protected $description = 'Tenant add';
 
     /**
      * Execute the console command.
@@ -40,10 +40,10 @@ class TenancyAddCommand extends BaseCommand
 
         $validation = [
             'name'        => 'required|string|between:3,128',
-            'reference'   => 'required|string|unique:tenancys|between:3,64',
+            'reference'   => 'required|string|unique:tenants|between:3,64',
             'db_host'     => 'nullable|string|between:1,128',
             'db_port'     => 'nullable|integer|between:1,10000',
-            'db_name'     => 'required|string|unique:tenancys|between:3,128',
+            'db_name'     => 'required|string|unique:tenants|between:3,128',
             'db_user'     => 'required|string|between:1,64',
             'db_password' => 'required|string'
         ];
@@ -52,24 +52,24 @@ class TenancyAddCommand extends BaseCommand
 
         if (!$validated) return 1;
 
-        $this->lineHeader('Adding Tenancy ' . $this->argument('name') ?: '');
+        $this->lineHeader('Adding Tenant ' . $this->argument('name') ?: '');
 
-        $tenancy = Tenancy::create($data);
+        $tenant = Tenant::create($data);
 
-        $this->info("Tenancy created » #{$tenancy->id} ({$tenancy->name})");
+        $this->info("Tenant created » #{$tenant->id} ({$tenant->name})");
 
         try {
             Database::create()
-                ->setDbName($tenancy->db_name)
-                ->setDbUser($tenancy->db_user)
-                ->setDbPassword($tenancy->db_password)
-                ->setDbHost($tenancy->db_host)
-                ->setDbPort($tenancy->db_port)
+                ->setDbName($tenant->db_name)
+                ->setDbUser($tenant->db_user)
+                ->setDbPassword($tenant->db_password)
+                ->setDbHost($tenant->db_host)
+                ->setDbPort($tenant->db_port)
                 ->createDatabase();
         } catch (\Exception $e) {
-            if (isset($tenancy)) {
-                $tenancy->delete();
-                $this->info('There was a problem on create database, tenancy removed.');
+            if (isset($tenant)) {
+                $tenant->delete();
+                $this->info('There was a problem on create database, tenant removed.');
             }
             
             $this->error($e->getMessage());
@@ -77,17 +77,17 @@ class TenancyAddCommand extends BaseCommand
             return 1;
         }
 
-        $this->info("Database created » {$tenancy->db_name}");
+        $this->info("Database created » {$tenant->db_name}");
 
-        $exitCode = $this->call('tenancy:migrate', [
-            'tenancy' => $tenancy->id,
+        $exitCode = $this->call('tenant:migrate', [
+            'tenant' => $tenant->id,
             '--fresh' => true,
             '--seed' => true
         ]);
 
-        if ($exitCode === 1 && isset($tenancy)) {
-            $tenancy->delete();
-            $this->info('There was a problem on migrate, tenancy removed.');
+        if ($exitCode === 1 && isset($tenant)) {
+            $tenant->delete();
+            $this->info('There was a problem on migrate, tenant removed.');
         }
 
         return $exitCode;

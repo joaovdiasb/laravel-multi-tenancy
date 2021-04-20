@@ -5,9 +5,9 @@ namespace Joaovdiasb\LaravelMultiTenancy;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Routing\Router;
-use Joaovdiasb\LaravelMultiTenancy\Http\Middleware\TenancyChangeConnection;
+use Joaovdiasb\LaravelMultiTenancy\Http\Middleware\TenantChangeConnection;
 use Illuminate\Contracts\Http\Kernel;
-use Joaovdiasb\LaravelMultiTenancy\Console\{TenancyAddCommand, TenancyBackupCommand, TenancyMigrateCommand};
+use Joaovdiasb\LaravelMultiTenancy\Console\{TenantAddCommand, TenantBackupCommand, TenantMigrateCommand};
 
 class LaravelMultiTenancyServiceProvider extends ServiceProvider
 {
@@ -18,7 +18,7 @@ class LaravelMultiTenancyServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->mergeConfigFrom(__DIR__ . '/../config/tenancy.php', 'laravel-multi-tenancy');
+        $this->mergeConfigFrom(__DIR__ . '/../config/tenant.php', 'laravel-multi-tenancy');
         $this->publishConfig();
         $this->publishMigration();
         $this->routeMiddleware();
@@ -75,10 +75,10 @@ class LaravelMultiTenancyServiceProvider extends ServiceProvider
      */
     public function routeMiddleware(): void
     {
-        $middlewareClass = TenancyChangeConnection::class;
+        $middlewareClass = TenantChangeConnection::class;
 
         $router = $this->app->make(Router::class);
-        $router->aliasMiddleware('tenancy', $middlewareClass);
+        $router->aliasMiddleware('multitenancy', $middlewareClass);
 
         $kernel = $this->app->make(Kernel::class);
         $kernel->prependToMiddlewarePriority($middlewareClass);
@@ -92,9 +92,9 @@ class LaravelMultiTenancyServiceProvider extends ServiceProvider
     public function publishMigration(): void
     {
         if ($this->app->runningInConsole()) {
-            if (!class_exists('app\database\migrations\tenancy\CreateTenancysTable')) {
+            if (!class_exists('app\database\migrations\tenant\CreateTenantsTable')) {
                 $this->publishes([
-                    __DIR__ . '/../database/migrations/create_tenancys_table.php.stub' => database_path('migrations/tenancy/' . date('Y_m_d_His', time()) . '_create_tenancys_table.php'),
+                    __DIR__ . '/../database/migrations/create_tenants_table.php.stub' => database_path('migrations/tenant/' . date('Y_m_d_His', time()) . '_create_tenants_table.php'),
                 ], 'migrations');
             }
         }
@@ -109,7 +109,7 @@ class LaravelMultiTenancyServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__ . '/../config/tenancy.php' => config_path('tenancy.php'),
+                __DIR__ . '/../config/tenant.php' => config_path('tenant.php'),
             ], 'config');
         }
     }
@@ -123,9 +123,9 @@ class LaravelMultiTenancyServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->commands([
-                TenancyAddCommand::class,
-                TenancyMigrateCommand::class,
-                TenancyBackupCommand::class
+                TenantAddCommand::class,
+                TenantMigrateCommand::class,
+                TenantBackupCommand::class
             ]);
         }
     }

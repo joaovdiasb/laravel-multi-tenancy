@@ -3,9 +3,9 @@
 namespace Joaovdiasb\LaravelMultiTenancy\Http\Middleware;
 
 use Closure;
-use Joaovdiasb\LaravelMultiTenancy\Model\Tenancy;
+use Joaovdiasb\LaravelMultiTenancy\Model\Tenant;
 
-class TenancyChangeConnection
+class TenantChangeConnection
 {
     /**
      * Handle an incoming request.
@@ -13,7 +13,7 @@ class TenancyChangeConnection
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
      * 
-     * @throws \Joaovdiasb\LaravelMultiTenancy\Exceptions\TenancyException
+     * @throws \Joaovdiasb\LaravelMultiTenancy\Exceptions\TenantException
      * 
      * @return mixed
      */
@@ -21,7 +21,7 @@ class TenancyChangeConnection
     {
         if(!app()->runningInConsole()){
             $reference = request()->header('X-Ref');
-            Tenancy::findFirstByKey('reference', $reference)->configure()->use();
+            Tenant::findFirstByKey('reference', $reference)->configure()->use();
         }
 
         return $next($request);

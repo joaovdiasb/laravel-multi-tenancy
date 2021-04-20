@@ -2,34 +2,29 @@
 
 namespace Joaovdiasb\LaravelMultiTenancy\Tests;
 
-use Orchestra\Testbench\TestCase as BaseTestCase;
+use Orchestra\Testbench\TestCase as Orchestra;
 use Joaovdiasb\LaravelMultiTenancy\LaravelMultiTenancyServiceProvider;
 
-class TestCase extends BaseTestCase
+abstract class TestCase extends Orchestra
 {
     public function setup(): void
     {
         parent::setUp();
         $this->withoutExceptionHandling();
         $this->setUpDatabase();
-        // $this->artisan('migrate', ['--database' => 'tenancy']);
-        // $this->loadMigrationsFrom(__DIR__ . '/../src/database/migrations');
-        // $this->loadLaravelMigrations(['--database' => 'tenancy']);
-        // $this->beforeApplicationDestroyed(function () {
-        //     $this->artisan('migrate:rollback');
-        // });
     }
 
     protected function getEnvironmentSetUp($app)
     {
         $app->bind('DatabaseSeeder', 'Joaovdiasb\LaravelMultiTenancy\Tests\MockDatabaseSeeder');
-        $app['config']->set('tenancy', [
+        $app['config']->set('tenant', [
             'encrypt_key' => '318654690878bef944a8b542ddb55d82',
             'database'    => 'mysql',
-            'current_container_key' => 'currentTenancy',
-            'connection_name' => 'tenancy',
+            'current_container_key' => 'currentTenant',
+            'tenant_connection_name' => 'tenant',
+            'landlord_connection_name' => 'landlord',
         ]);
-        $app['config']->set('database.connections.tenancy', [
+        $app['config']->set('database.connections.tenant', [
             'driver'   => env('DB_DRIVER'),
             'database' => env('DB_DATABASE'),
             'host'     => env('DB_HOST'),
@@ -46,8 +41,8 @@ class TestCase extends BaseTestCase
 
     protected function setUpDatabase()
     {
-        include_once __DIR__ . '/../database/migrations/create_tenancys_table.php.stub';
-        (new \CreateTenancysTable())->down();
-        (new \CreateTenancysTable())->up();
+        include_once __DIR__ . '/../database/migrations/create_tenants_table.php.stub';
+        (new \CreateTenantsTable())->down();
+        (new \CreateTenantsTable())->up();
     }
 }
