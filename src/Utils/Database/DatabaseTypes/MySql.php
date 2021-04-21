@@ -1,10 +1,12 @@
 <?php
 
-namespace Joaovdiasb\LaravelMultiTenancy\Utils\Database;
+namespace Joaovdiasb\LaravelMultiTenancy\Utils\Database\DatabaseTypes;
 
+use Joaovdiasb\LaravelMultiTenancy\Utils\Database\Contracts\DatabaseType;
 use Symfony\Component\Process\Process;
+use Joaovdiasb\LaravelMultiTenancy\Utils\Database\Database;
 
-class MySql extends Database
+class MySql extends Database implements DatabaseType
 {
   /** @var false|resource */
   private $tempFileHandle;
@@ -34,7 +36,7 @@ class MySql extends Database
     return implode(' ', $command);
   }
 
-  public function createDatabase()
+  public function createDatabase(): void
   {
     $tempFileHandle = tmpfile();
     $this->setTempFileHandle($tempFileHandle);
@@ -80,7 +82,7 @@ class MySql extends Database
     return $this->echoToFile(implode(' ', $command), $dumpFilePath);
   }
 
-  public function dumpToFile(string $dumpFilePath)
+  public function dumpToFile(string $dumpFilePath): void
   {
     $tempFileHandle = tmpfile();
     $this->setTempFileHandle($tempFileHandle);

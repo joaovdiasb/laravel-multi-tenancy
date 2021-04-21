@@ -15,8 +15,6 @@ class Tenant extends Model
     
     protected $table = 'tenants';
 
-    static protected array $beforeCurrentConnection = [];
-
     protected $fillable = [
         'name',
         'reference',
@@ -101,10 +99,8 @@ class Tenant extends Model
 
     public function configure(): self
     {
-        $this->beforeCurrentConnection = config($this->tenantConnectionFullName());
-
         config([$this->tenantConnectionFullName() => [
-            'driver'    => config($this->tenantConnectionFullName() . '.driver'),
+            'driver'    => config($this->landlordConnectionFullName() . '.driver'),
             'host'      => $this->db_host,
             'port'      => $this->db_port,
             'database'  => $this->db_name,
@@ -116,20 +112,7 @@ class Tenant extends Model
 
         DB::purge($this->tenantConnectionName());
 
-        return $this;
-    }
-
-    public function configureBack(): self
-    {
-        if (empty($this->beforeCurrentConnection)) {
-            return $this;
-        }
-
-        config([$this->tenantConnectionFullName() => $this->beforeCurrentConnection]);
-
-        $this->configureRootFolder($this->reference ?? '');
-
-        DB::purge($this->tenantConnectionName());
+        config(['database.default' => $this->tenantConnectionName()]);
 
         return $this;
     }
@@ -140,6 +123,21 @@ class Tenant extends Model
 
         app()->forgetInstance($containerKey);
         app()->instance($containerKey, $this);
+
+        return $this;
+    }
+
+    public function restore(): self
+    {
+        config([$this->tenantConnectionFullName() => null]);
+
+        $this->configureRootFolder('');
+
+        DB::purge($this->tenantConnectionName());
+
+        config(['database.default' => $this->landlordConnectionName()]);
+
+        app()->forgetInstance(config('multitenancy.current_container_key'));
 
         return $this;
     }

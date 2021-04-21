@@ -35,7 +35,7 @@ class TenantMigrateCommand extends BaseCommand
                 ? $this->migrate(Tenant::find($this->argument('tenant')))
                 : Tenant::all()->each(fn ($tenant) => $this->migrate($tenant));
         } catch (\Exception $e) {
-            $this->tenant->configureBack()->use();
+            $this->tenant->restore();
             $this->error($e->getMessage());
 
             return 1;
@@ -49,8 +49,6 @@ class TenantMigrateCommand extends BaseCommand
         $this->tenant = $tenant;
 
         $tenant->configure()->use();
-
-        DB::connection('tenant')->getDatabaseName();
 
         $this->lineHeader("Migrating Tenant #{$tenant->id} ({$tenant->name})");
 
@@ -80,6 +78,6 @@ class TenantMigrateCommand extends BaseCommand
             ]);
         }
 
-        $tenant->configureBack()->use();
+        $tenant->restore();
     }
 }
