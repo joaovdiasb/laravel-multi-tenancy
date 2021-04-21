@@ -32,7 +32,7 @@ class TenantSeedCommand extends BaseCommand
         ? $this->migrate(Tenant::find($this->argument('tenant')))
         : Tenant::all()->each(fn ($tenant) => $this->migrate($tenant));
     } catch (\Exception $e) {
-      $this->tenant->configureBack()->use();
+      $this->tenant->restore();
       $this->error($e->getMessage());
 
       return 1;

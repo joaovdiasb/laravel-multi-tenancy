@@ -11,11 +11,7 @@ return [
 
     'tenant_connection_name' => 'tenant',
 
-    /**
-     * You can set this configuration to null and define the connection name
-     * on env variable called DB_CONNECTION
-     */
-    'landlord_connection_name' => 'landlord',
+    'landlord_connection_name' => env('DB_CONNECTION', 'landlord'),
 
     'backup' => [
         'temp_folder' => storage_path('app/backup-temp/'),
