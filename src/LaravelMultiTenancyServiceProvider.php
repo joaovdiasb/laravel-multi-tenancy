@@ -8,9 +8,12 @@ use Illuminate\Routing\Router;
 use Joaovdiasb\LaravelMultiTenancy\Http\Middleware\TenantChangeConnection;
 use Illuminate\Contracts\Http\Kernel;
 use Joaovdiasb\LaravelMultiTenancy\Console\{TenantAddCommand, TenantBackupCommand, TenantMigrateCommand};
+use Joaovdiasb\LaravelMultiTenancy\Traits\MultitenancyConfig;
 
 class LaravelMultiTenancyServiceProvider extends ServiceProvider
 {
+    use MultitenancyConfig;
+
     /**
      * Bootstrap any application services.
      *
@@ -18,6 +21,7 @@ class LaravelMultiTenancyServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        $this->changePassportConnection();
         $this->mergeConfigFrom(__DIR__ . '/../config/multitenancy.php', 'laravel-multi-tenancy');
         $this->publishConfig();
         $this->publishMigration();
@@ -27,6 +31,11 @@ class LaravelMultiTenancyServiceProvider extends ServiceProvider
         // $this->loadViewsFrom(__DIR__.'/resources/views', 'laravel-multi-tenancy');
         // $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
         // $this->registerRoutes();
+    }
+
+    private function changePassportConnection()
+    {
+        config(['passport.storage.database.connection' => $this->tenantConnectionName()]);
     }
 
     /**
