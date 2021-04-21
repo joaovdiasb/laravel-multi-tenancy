@@ -11,7 +11,7 @@ trait MultitenancyConfig
 
   public function tenantConnectionName(): string
   {
-    return config('multitenancy.tenant_connection_name') ?? config('database.default');
+    return config('multitenancy.tenant_connection_name');
   }
 
   public function landlordConnectionFullName(): string
