@@ -45,7 +45,7 @@ abstract class Database
             throw DatabaseException::invalidTypeConfig(config('multitenancy.database'));
         }
 
-        $databaseTypeClass = '\Joaovdiasb\LaravelMultiTenancy\Utils\Database\\' . $databaseTypes[$databaseType];
+        $databaseTypeClass = '\Joaovdiasb\LaravelMultiTenancy\Utils\Database\DatabaseTypes\\' . $databaseTypes[$databaseType];
 
         return new $databaseTypeClass;
     }

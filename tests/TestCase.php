@@ -4,9 +4,12 @@ namespace Joaovdiasb\LaravelMultiTenancy\Tests;
 
 use Orchestra\Testbench\TestCase as Orchestra;
 use Joaovdiasb\LaravelMultiTenancy\LaravelMultiTenancyServiceProvider;
+use Joaovdiasb\LaravelMultiTenancy\Traits\MultitenancyConfig;
 
 abstract class TestCase extends Orchestra
 {
+    use MultitenancyConfig;
+
     public function setup(): void
     {
         parent::setUp();
@@ -24,7 +27,7 @@ abstract class TestCase extends Orchestra
             'tenant_connection_name'   => 'tenant',
             'landlord_connection_name' => 'landlord',
         ]);
-        $app['config']->set('database.connections.tenant', [
+        $app['config']->set($this->landlordConnectionFullName(), [
             'driver'   => env('DB_DRIVER'),
             'database' => env('DB_DATABASE'),
             'host'     => env('DB_HOST'),

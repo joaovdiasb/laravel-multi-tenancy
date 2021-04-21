@@ -12,7 +12,7 @@
   </testsuites>
   <php>
     <env name="APP_ENV" value="testing" force="true"/>
-    <env name="DB_CONNECTION" value="tenant" force="true"/>
+    <env name="DB_CONNECTION" value="landlord" force="true"/>
     <env name="DB_DRIVER" value="mysql" force="true"/>
     <env name="DB_DATABASE" value="testing" force="true"/>
     <env name="DB_HOST" value="127.0.0.1" force="true"/>
