@@ -12,19 +12,25 @@ Install via composer
 composer require joaovdiasb/laravel-multi-tenancy
 ```
 
+
 ## Configuration
+
 1. Publish provider and migrate:
 ```bash
 php artisan vendor:publish --provider="Joaovdiasb\LaravelMultiTenancy\LaravelMultiTenancyServiceProvider" && php artisan migrate --path=./database/migrations/tenant
 ```
-2. Define connections on published config called tenant;
-3. Add TENANCY_ENCRYPT_KEY with 32 random characters string.
+2. Change env variable DB_CONNECTION with the `landlord_connection_name` defined on published config called multitenancy;
+3. Add env variable TENANT_ENCRYPT_KEY with 32 random characters string.
+
 
 ## Usage
+
 1. Add middleware *multitenancy* on the routes that you need;
 2. Send *X-Ref* header on request with tenant reference, defined on tenants table.
 
+
 ## Commands
+
 - Add tenant:
 ```bash
 php artisan tenant:add {name?} {reference?} {db_name?} {db_user?} {db_password?} {db_host?} {db_port?}
@@ -57,7 +63,9 @@ php artisan tenant:backup {tenant?}
 ```
 > **{tenant?}** Select tenant by id, if is not present, all tenants are selected
 
+
 ## Testing
+
 Run the tests with:
 
 ```bash
