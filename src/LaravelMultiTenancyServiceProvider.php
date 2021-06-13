@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Routing\Router;
 use Joaovdiasb\LaravelMultiTenancy\Http\Middleware\TenantChangeConnection;
 use Illuminate\Contracts\Http\Kernel;
-use Joaovdiasb\LaravelMultiTenancy\Console\{TenantAddCommand, TenantBackupCommand, TenantMigrateCommand};
+use Joaovdiasb\LaravelMultiTenancy\Console\{TenantAddCommand, TenantBackupCleanupCommand, TenantBackupCommand, TenantMigrateCommand, TenantSeedCommand};
 use Joaovdiasb\LaravelMultiTenancy\Traits\MultitenancyConfig;
 
 class LaravelMultiTenancyServiceProvider extends ServiceProvider
@@ -27,9 +27,6 @@ class LaravelMultiTenancyServiceProvider extends ServiceProvider
         $this->publishMigration();
         $this->routeMiddleware();
         $this->registerCommands();
-
-        // $this->loadViewsFrom(__DIR__.'/resources/views', 'laravel-multi-tenancy');
-        // $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
         // $this->registerRoutes();
     }
 
@@ -134,7 +131,9 @@ class LaravelMultiTenancyServiceProvider extends ServiceProvider
             $this->commands([
                 TenantAddCommand::class,
                 TenantMigrateCommand::class,
-                TenantBackupCommand::class
+                TenantBackupCommand::class,
+                TenantSeedCommand::class,
+                TenantBackupCleanupCommand::class
             ]);
         }
     }

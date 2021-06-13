@@ -19,8 +19,7 @@ composer require joaovdiasb/laravel-multi-tenancy
 ```bash
 php artisan vendor:publish --provider="Joaovdiasb\LaravelMultiTenancy\LaravelMultiTenancyServiceProvider" && php artisan migrate --path=./database/migrations/tenant
 ```
-2. Define the landlord database connection, the connection name should be the same on env variable `DB_CONNECTION`;
-3. Add env variable `TENANT_ENCRYPT_KEY` with 32 random characters string.
+2. Add env variable `TENANT_ENCRYPT_KEY` with 32 random characters string.
 
 
 ## Usage

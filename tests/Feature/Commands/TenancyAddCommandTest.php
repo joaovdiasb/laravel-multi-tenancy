@@ -36,47 +36,40 @@ class TenantAddCommandTest extends TestCase
   }
 
   /** @test */
-  public function it_add_a_tenant_and_create_database_after_command_runs_successfully()
+  public function it_create_database_and_tenant_after_command_runs_successfully()
   {
     $this->artisan('tenant:add', $this->commandParams)
       ->assertExitCode(0);
 
-    $tenant = Tenant::latest()->first()->configure()->use();
-
-    $this->assertNotEmpty($tenant);
+    $tenant = (new Tenant())->restore()->latest()->first()->configure()->use();
+    $this->assertTrue($tenant->id === Tenant::current()->id);
     $this->assertTrue(config('database.connections.' .  config('database.default') . '.database') === $tenant->db_name);
 
     $this->clearTest($tenant);
   }
 
   /** @test */
-  public function it_clear_tenant_connection_and_delete_tenant_when_fail_create_database_with_not_allowed_name()
+  public function it_delete_tenant_when_fail_create_database_with_not_allowed_name()
   {
     $this->commandParams['db_name'] = '000';
 
     $this->artisan('tenant:add', $this->commandParams)
       ->assertExitCode(1);
 
-    $this->assertTrue(config($this->tenantConnectionFullName()) === null);
-
-    try {
-      $this->assertEmpty(Tenant::findFirstByKey('reference', $this->commandParams['reference']));
-    } catch (TenantException $e) {
-      $this->assertNotEmpty($e);
-    };
+    $this->expectException(TenantException::class);
+    Tenant::findFirstByKey('reference', $this->commandParams['reference']);
   }
   
   /** @test */
-  public function it_dont_change_landlord_connection_and_clear_tenant_connection_after_command_runs_successfully()
+  public function it_dont_change_landlord_connection_after_command_runs_successfully()
   {
     $beforeConn = config($this->landlordConnectionFullName());
 
     $this->artisan('tenant:add', $this->commandParams)
       ->assertExitCode(0);
 
-    $this->assertTrue(config($this->tenantConnectionFullName()) === null);
-
-    $tenant = Tenant::latest()->first()->configure()->use();
+    $tenant = (new Tenant())->restore()->latest()->first()->configure()->use();
+    $this->assertNotEmpty($tenant);
 
     $diff = array_diff_assoc($beforeConn, config($this->landlordConnectionFullName()));
     $this->assertEmpty($diff);

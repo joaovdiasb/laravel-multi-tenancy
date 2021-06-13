@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Console\Commands;
+namespace Joaovdiasb\LaravelMultiTenancy\Console;
 
 use App\Models\Tenant;
 

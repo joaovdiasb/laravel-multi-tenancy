@@ -32,8 +32,8 @@ class TenantBackupCommand extends BaseCommand
     {
         try {
             $this->argument('tenant')
-                ? $this->migrate(Tenant::find($this->argument('tenant')))
-                : Tenant::all()->each(fn ($tenant) => $this->migrate($tenant));
+                ? $this->backup(Tenant::find($this->argument('tenant')))
+                : Tenant::all()->each(fn ($tenant) => $this->backup($tenant));
         } catch (\Exception $e) {
             $this->tenant->restore();
             $this->error($e->getMessage());
@@ -47,7 +47,7 @@ class TenantBackupCommand extends BaseCommand
     public function backup($tenant): void
     {
         $this->tenant = $tenant;
-        
+
         $tenant->configure()->use();
 
         $this->lineHeader("Backup Tenant #{$tenant->id} ({$tenant->name})");
@@ -91,6 +91,6 @@ class TenantBackupCommand extends BaseCommand
             $this->info("Copying to backup disk [{$disk}] » {$backupFullPath}");
         }
 
-        $tenant->configureBack()->use();
+        $this->tenant->restore();
     }
 }

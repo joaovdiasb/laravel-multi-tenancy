@@ -2,7 +2,6 @@
 
 namespace Joaovdiasb\LaravelMultiTenancy\Console;
 
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Schema;
 use Joaovdiasb\LaravelMultiTenancy\Model\Tenant;
