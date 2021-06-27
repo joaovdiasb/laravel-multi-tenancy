@@ -59,5 +59,7 @@ class TenantSeedCommand extends BaseCommand
       'db:seed',
       $options
     );
+
+    $tenant->restore();
   }
 }

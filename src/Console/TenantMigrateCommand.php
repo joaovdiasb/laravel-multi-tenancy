@@ -2,12 +2,14 @@
 
 namespace Joaovdiasb\LaravelMultiTenancy\Console;
 
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\{App, DB};
 use Joaovdiasb\LaravelMultiTenancy\Model\Tenant;
+use Joaovdiasb\LaravelMultiTenancy\Traits\MultitenancyConfig;
 
 class TenantMigrateCommand extends BaseCommand
 {
+    use MultitenancyConfig;
+
     /**
      * The name and signature of the console command.
      *
@@ -51,10 +53,14 @@ class TenantMigrateCommand extends BaseCommand
 
         $this->lineHeader("Migrating Tenant #{$tenant->id} ({$tenant->name})");
 
+        $databaseHasData = DB::connection($this->tenantConnectionName())
+            ->getDoctrineSchemaManager()
+            ->listTableNames();
+
         if (
+            $databaseHasData &&
             App::environment('production') &&
-            Schema::hasTable('migrations') &&
-            !$this->confirm('The client has data, are you sure you want to continue?')
+            !$this->confirm("The client has data, are you sure you want to continue?")
         ) {
             throw new \Exception('Action canceled.');
         }

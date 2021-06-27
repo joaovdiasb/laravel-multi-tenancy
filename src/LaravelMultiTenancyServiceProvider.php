@@ -14,6 +14,13 @@ class LaravelMultiTenancyServiceProvider extends ServiceProvider
 {
     use MultitenancyConfig;
 
+    protected $root;
+
+    public function __construct($app) {
+        parent::__construct($app);
+        $this->root = realpath(__DIR__ . '/../');
+    }
+
     /**
      * Bootstrap any application services.
      *
@@ -22,7 +29,7 @@ class LaravelMultiTenancyServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->changePassportConnection();
-        $this->mergeConfigFrom(__DIR__ . '/../config/multitenancy.php', 'laravel-multi-tenancy');
+        $this->mergeConfigFrom("{$this->root}/config/multitenancy.php", 'laravel-multi-tenancy');
         $this->publishConfig();
         $this->publishMigration();
         $this->routeMiddleware();
@@ -43,7 +50,7 @@ class LaravelMultiTenancyServiceProvider extends ServiceProvider
     private function registerRoutes()
     {
         Route::group($this->routeConfiguration(), function () {
-            $this->loadRoutesFrom(__DIR__ . '/Http/routes.php');
+            $this->loadRoutesFrom("{$this->root}/Http/routes.php");
         });
     }
 
@@ -100,7 +107,7 @@ class LaravelMultiTenancyServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             if (!class_exists('app\database\migrations\tenant\CreateTenantsTable')) {
                 $this->publishes([
-                    __DIR__ . '/../database/migrations/create_tenants_table.php.stub' => database_path('migrations/tenant/' . date('Y_m_d_His', time()) . '_create_tenants_table.php'),
+                    "{$this->root}/database/migrations/create_tenants_table.php.stub" => database_path('migrations/tenant/' . date('Y_m_d_His', time()) . '_create_tenants_table.php'),
                 ], 'migrations');
             }
         }
@@ -115,7 +122,7 @@ class LaravelMultiTenancyServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__ . '/../config/multitenancy.php' => config_path('multitenancy.php'),
+                "{$this->root}/config/multitenancy.php" => config_path('multitenancy.php'),
             ], 'config');
         }
     }

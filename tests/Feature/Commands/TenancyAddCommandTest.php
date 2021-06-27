@@ -41,9 +41,11 @@ class TenantAddCommandTest extends TestCase
     $this->artisan('tenant:add', $this->commandParams)
       ->assertExitCode(0);
 
-    $tenant = (new Tenant())->restore()->latest()->first()->configure()->use();
+    $tenant = (new Tenant())->latest()->first()->configure()->use();
     $this->assertTrue($tenant->id === Tenant::current()->id);
-    $this->assertTrue(config('database.connections.' .  config('database.default') . '.database') === $tenant->db_name);
+    $this->assertTrue(
+      config($this->tenantConnectionFullName() . '.database') === $tenant->db_name
+    );
 
     $this->clearTest($tenant);
   }
@@ -68,7 +70,7 @@ class TenantAddCommandTest extends TestCase
     $this->artisan('tenant:add', $this->commandParams)
       ->assertExitCode(0);
 
-    $tenant = (new Tenant())->restore()->latest()->first()->configure()->use();
+    $tenant = (new Tenant())->latest()->first()->configure()->use();
     $this->assertNotEmpty($tenant);
 
     $diff = array_diff_assoc($beforeConn, config($this->landlordConnectionFullName()));
