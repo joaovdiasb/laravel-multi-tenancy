@@ -92,7 +92,7 @@ class Tenant extends Model
     {
         foreach (array_keys(config('filesystems.disks')) as $disk) {
             config([
-                "filesystems.disks.{$disk}.root" => config("filesystems.disks.{$disk}.root") . $reference
+                "filesystems.disks.{$disk}.root" => config("filesystems.disks.{$disk}.root.") . $reference
             ]);
         };
     }
