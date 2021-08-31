@@ -105,7 +105,9 @@ class Tenant extends Model
             'port'      => $this->db_port,
             'database'  => $this->db_name,
             'username'  => $this->db_user,
-            'password'  => $this->db_password
+            'password'  => $this->db_password,
+            'charset' => 'utf8',
+            'collation' => 'utf8_unicode_ci'
         ]]);
 
         $this->configureRootFolder($this->reference);
