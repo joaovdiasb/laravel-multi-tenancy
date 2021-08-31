@@ -2,7 +2,7 @@
 
 namespace Joaovdiasb\LaravelMultiTenancy\Console;
 
-use App\Models\Tenant;
+use Joaovdiasb\LaravelMultiTenancy\Model\Tenant;
 
 class TenantSeedCommand extends BaseCommand
 {
