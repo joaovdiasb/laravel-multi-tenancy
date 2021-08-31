@@ -29,8 +29,8 @@ class TenantSeedCommand extends BaseCommand
   {
     try {
       $this->argument('tenant')
-        ? $this->migrate(Tenant::find($this->argument('tenant')))
-        : Tenant::all()->each(fn ($tenant) => $this->migrate($tenant));
+        ? $this->seed(Tenant::find($this->argument('tenant')))
+        : Tenant::all()->each(fn ($tenant) => $this->seed($tenant));
     } catch (\Exception $e) {
       $this->tenant->restore();
       $this->error($e->getMessage());
@@ -41,7 +41,7 @@ class TenantSeedCommand extends BaseCommand
     return 0;
   }
 
-  public function seed($tenant)
+  public function seed($tenant): void
   {
     $this->tenant = $tenant;
 
