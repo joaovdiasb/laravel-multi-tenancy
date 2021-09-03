@@ -101,9 +101,9 @@ class Tenant extends Model
 
     public function configure(): self
     {
-        $selectedDatabaseDriver = Database::DATABASE_DRIVERS[strtolower($this->driver ?: config('multitenancy.database'))];
+        $selectedDatabaseDriver = Database::DATABASE_DRIVERS[strtolower($this->driver ?: config('multitenancy.database'))] ?? null;
 
-        if (!isset($selectedDatabaseDriver)) {
+        if (empty($selectedDatabaseDriver)) {
             throw DatabaseException::invalidTypeConfig($selectedDatabaseDriver);
         }
 

@@ -11,8 +11,8 @@ class DatabaseException extends Exception
    * 
    * @return \Joaovdiasb\LaravelMultiTenancy\Exceptions\DatabaseException
    */
-  public static function invalidTypeConfig(string $config): self
+  public static function invalidTypeConfig(?string $config = null): self
   {
-    return new static("Invalid database type config named \"{$config}\"");
+    return new static("Invalid database type config \"{$config}\"");
   }
 }
