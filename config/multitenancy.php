@@ -4,7 +4,7 @@ return [
     // Used to ecrypt tenant database password
     'encrypt_key' => env('TENANT_ENCRYPT_KEY'),
 
-    // Database type used on commands
+    // If driver not defined on tenant this database type will be used on command and connection
     'database' => 'mysql',
 
     'current_container_key' => 'currentTenant',

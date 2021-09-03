@@ -12,7 +12,7 @@ class TenantAddCommand extends BaseCommand
      *
      * @var string
      */
-    protected $signature = 'tenant:add {name?} {reference?} {db_name?} {db_user?} {db_password?} {db_host?} {db_port?}';
+    protected $signature = 'tenant:add {name?} {reference?} {db_name?} {db_user?} {db_password?} {db_host?} {db_port?} {driver?}';
 
     /**
      * The console command description.
@@ -35,7 +35,8 @@ class TenantAddCommand extends BaseCommand
             'db_port'     => $this->argument('db_port') ?? $this->ask('What is the port of connection?', '3306'),
             'db_name'     => $this->argument('db_name') ?? $this->ask('What is the database name of connection?'),
             'db_user'     => $this->argument('db_user') ?? $this->ask('What is the username of connection?'),
-            'db_password' => $this->argument('db_password') ?? $this->ask('What is the password of connection?')
+            'db_password' => $this->argument('db_password') ?? $this->ask('What is the password of connection?'),
+            'driver'      => $this->argument('driver') ?? $this->ask('What is the driver of connection?')
         ];
 
         $validation = [
@@ -45,7 +46,8 @@ class TenantAddCommand extends BaseCommand
             'db_port'     => 'nullable|integer|between:1,10000',
             'db_name'     => 'required|string|unique:tenants|between:3,128',
             'db_user'     => 'required|string|between:1,64',
-            'db_password' => 'required|string'
+            'db_password' => 'required|string',
+            'driver'      => 'nullable|string'
         ];
 
         $validated = $this->validate($data, $validation);
@@ -59,7 +61,7 @@ class TenantAddCommand extends BaseCommand
         $this->info("Tenant created » #{$tenant->id} ({$tenant->name})");
 
         try {
-            Database::create()
+            Database::create($data['driver'])
                 ->setDbName($tenant->db_name)
                 ->setDbUser($tenant->db_user)
                 ->setDbPassword($tenant->db_password)

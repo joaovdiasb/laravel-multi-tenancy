@@ -17,13 +17,14 @@ class CreateTenantsTable extends Migration
             $table->id();
             $table->uuid('uuid');
 
-            $table->string('name')->nullable(false);
-            $table->string('reference')->unique()->nullable(false);
-            $table->string('db_host')->nullable(false);
-            $table->integer('db_port')->nullable(false);
-            $table->string('db_name')->nullable(false);
-            $table->string('db_user')->nullable(false);
-            $table->text('db_password')->nullable(false);
+            $table->string('name');
+            $table->string('reference')->unique();
+            $table->string('db_host');
+            $table->integer('db_port');
+            $table->string('db_name');
+            $table->string('db_user');
+            $table->text('db_password');
+            $table->string('driver')->nullable();
 
             $table->timestamps();
         });

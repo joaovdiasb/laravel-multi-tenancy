@@ -25,7 +25,8 @@ class TenantAddCommandTest extends TestCase
       'db_port'     => config($this->landlordConnectionFullName() . '.port'),
       'db_name'     => 'test' . Str::uuid()->getHex(),
       'db_user'     => config($this->landlordConnectionFullName() . '.username'),
-      'db_password' => config($this->landlordConnectionFullName() . '.password')
+      'db_password' => config($this->landlordConnectionFullName() . '.password'),
+      'driver'      => ''
     ];
   }
 

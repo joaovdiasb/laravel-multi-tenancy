@@ -6,8 +6,9 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Database\Eloquent\Model;
-use Joaovdiasb\LaravelMultiTenancy\Exceptions\TenantException;
+use Joaovdiasb\LaravelMultiTenancy\Exceptions\{DatabaseException, TenantException};
 use Joaovdiasb\LaravelMultiTenancy\Traits\MultitenancyConfig;
+use Joaovdiasb\LaravelMultiTenancy\Utils\Database\Database;
 
 class Tenant extends Model
 {
@@ -22,7 +23,8 @@ class Tenant extends Model
         'db_port',
         'db_name',
         'db_user',
-        'db_password'
+        'db_password',
+        'driver'
     ];
 
     protected static function boot(): void
@@ -33,7 +35,7 @@ class Tenant extends Model
     }
 
     /**
-     * findFirstByKey
+     * Find first tenant by key
      *
      * @param string $key
      * @param string $value
@@ -99,14 +101,20 @@ class Tenant extends Model
 
     public function configure(): self
     {
+        $selectedDatabaseDriver = Database::DATABASE_DRIVERS[strtolower($this->driver ?: config('multitenancy.database'))];
+
+        if (!isset($selectedDatabaseDriver)) {
+            throw DatabaseException::invalidTypeConfig($selectedDatabaseDriver);
+        }
+
         config([$this->tenantConnectionFullName() => [
-            'driver'    => config($this->landlordConnectionFullName() . '.driver'),
+            'driver'    => $selectedDatabaseDriver,
             'host'      => $this->db_host,
             'port'      => $this->db_port,
             'database'  => $this->db_name,
             'username'  => $this->db_user,
             'password'  => $this->db_password,
-            'charset' => 'utf8',
+            'charset'   => 'utf8',
             'collation' => 'utf8_unicode_ci'
         ]]);
 

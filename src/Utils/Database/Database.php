@@ -26,26 +26,32 @@ abstract class Database
 
     protected bool $onlyData = false;
 
+    const DATABASE_TYPES = [
+        'mysql' => 'MySql'
+    ];
+
+    const DATABASE_DRIVERS = [
+        'mysql' => 'mysql'
+    ];
+
     /**
      * Create database type instance
      *
+     * @param string|null $databaseType
+     * 
      * @throws DatabaseException
      * 
      * @return mixed
      */
-    public static function create()
+    public static function create(?string $databaseType = null)
     {
-        $databaseTypes = [
-            'mysql' => 'MySql'
-        ];
+        $selectedDatabaseType = self::DATABASE_TYPES[$databaseType ?: strtolower(config('multitenancy.database'))];
 
-        $databaseType = strtolower(config('multitenancy.database'));
-
-        if (!isset($databaseTypes[$databaseType])) {
-            throw DatabaseException::invalidTypeConfig(config('multitenancy.database'));
+        if (!isset($selectedDatabaseType)) {
+            throw DatabaseException::invalidTypeConfig($selectedDatabaseType);
         }
 
-        $databaseTypeClass = '\Joaovdiasb\LaravelMultiTenancy\Utils\Database\DatabaseTypes\\' . $databaseTypes[$databaseType];
+        $databaseTypeClass = '\Joaovdiasb\LaravelMultiTenancy\Utils\Database\DatabaseTypes\\' . $selectedDatabaseType;
 
         return new $databaseTypeClass;
     }
@@ -117,7 +123,7 @@ abstract class Database
     }
 
     protected function isWindows(): bool
-    {
+    { 
         return strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
     }
 

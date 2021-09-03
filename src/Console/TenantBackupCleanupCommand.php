@@ -42,10 +42,12 @@ class TenantBackupCleanupCommand extends BaseCommand
         }
 
         foreach (config('multitenancy.backup.disks') as $disk) {
+            $storageDisk = Storage::disk($disk);
+            
             foreach (Tenant::all() as $tenant) {
-                foreach (Storage::disk($disk)->allFiles($tenant->reference) as $file) {
-                    if (Storage::disk($disk)->lastModified($file) > now()->addDays(-7)->endOfDay()->timestamp) {
-                        Storage::disk($disk)->delete($file);
+                foreach ($storageDisk->allFiles($tenant->reference) as $file) {
+                    if ($storageDisk->lastModified($file) > now()->addDays(-7)->endOfDay()->timestamp) {
+                        $storageDisk->delete($file);
                     }
                 }
             }

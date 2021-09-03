@@ -63,7 +63,7 @@ class TenantBackupCommand extends BaseCommand
             File::makeDirectory($backupTempPath, 0775);
         }
 
-        $conn = Database::create()
+        $conn = Database::create($tenant->driver)
             ->setDbName($tenant->db_name)
             ->setDbUser($tenant->db_user)
             ->setDbPassword($tenant->db_password)
