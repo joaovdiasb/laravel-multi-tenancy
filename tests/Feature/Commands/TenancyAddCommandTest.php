@@ -60,9 +60,14 @@ class TenantAddCommandTest extends TestCase
       ->assertExitCode(1);
 
     $this->expectException(TenantException::class);
-    Tenant::findFirstByKey('reference', $this->commandParams['reference']);
+
+    try {
+      Tenant::findFirstByKey('reference', $this->commandParams['reference']);
+    } catch (TenantException $e) {
+      throw $e;
+    }
   }
-  
+
   /** @test */
   public function it_dont_change_landlord_connection_after_command_runs_successfully()
   {

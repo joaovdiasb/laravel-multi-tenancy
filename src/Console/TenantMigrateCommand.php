@@ -24,6 +24,8 @@ class TenantMigrateCommand extends BaseCommand
      */
     protected $description = 'Tenant migrate';
 
+    private Tenant $tenant;
+
     /**
      * Execute the console command.
      *
@@ -31,16 +33,21 @@ class TenantMigrateCommand extends BaseCommand
      */
     public function handle(): int
     {
+        DB::beginTransaction();
+
         try {
             $this->argument('tenant')
                 ? $this->migrate(Tenant::find($this->argument('tenant')))
                 : Tenant::all()->each(fn ($tenant) => $this->migrate($tenant));
         } catch (\Exception $e) {
             $this->tenant->restore();
+            DB::rollback();
             $this->error($e->getMessage());
 
             return 1;
         }
+
+        DB::commit();
 
         return 0;
     }

@@ -23,6 +23,8 @@ class TenantBackupCommand extends BaseCommand
      */
     protected $description = 'Tenant backup';
 
+    private Tenant $tenant;
+
     /**
      * Execute the console command.
      *

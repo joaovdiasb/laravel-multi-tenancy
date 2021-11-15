@@ -3,6 +3,7 @@
 namespace Joaovdiasb\LaravelMultiTenancy\Console;
 
 use Joaovdiasb\LaravelMultiTenancy\Model\Tenant;
+use Illuminate\Support\Facades\DB;
 
 class TenantSeedCommand extends BaseCommand
 {
@@ -20,6 +21,8 @@ class TenantSeedCommand extends BaseCommand
    */
   protected $description = 'Tenant seed';
 
+  private Tenant $tenant;
+
   /**
    * Execute the console command.
    *
@@ -27,16 +30,21 @@ class TenantSeedCommand extends BaseCommand
    */
   public function handle(): int
   {
+    DB::beginTransaction();
+
     try {
       $this->argument('tenant')
         ? $this->seed(Tenant::find($this->argument('tenant')))
         : Tenant::all()->each(fn ($tenant) => $this->seed($tenant));
     } catch (\Exception $e) {
       $this->tenant->restore();
+      DB::rollback();
       $this->error($e->getMessage());
 
       return 1;
     }
+
+    DB::commit();
 
     return 0;
   }

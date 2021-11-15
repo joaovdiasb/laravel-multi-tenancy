@@ -4,6 +4,7 @@ namespace Joaovdiasb\LaravelMultiTenancy\Console;
 
 use Joaovdiasb\LaravelMultiTenancy\Model\Tenant;
 use Joaovdiasb\LaravelMultiTenancy\Utils\Database\Database;
+use Illuminate\Support\Facades\DB;
 
 class TenantAddCommand extends BaseCommand
 {
@@ -56,42 +57,44 @@ class TenantAddCommand extends BaseCommand
 
         $this->lineHeader('Adding Tenant ' . $this->argument('name') ?: '');
 
-        $tenant = Tenant::create($data);
-
-        $this->info("Tenant created » #{$tenant->id} ({$tenant->name})");
+        DB::beginTransaction();
 
         try {
-            Database::create($data['driver'])
+            $tenant = Tenant::create($data);
+
+            $this->info("Tenant created » #{$tenant->id} ({$tenant->name})");
+
+            Database::create($tenant->driver)
                 ->setDbName($tenant->db_name)
                 ->setDbUser($tenant->db_user)
                 ->setDbPassword($tenant->db_password)
                 ->setDbHost($tenant->db_host)
                 ->setDbPort($tenant->db_port)
                 ->createDatabase();
-        } catch (\Exception $e) {
-            if (isset($tenant)) {
-                $tenant->delete();
-                $this->info('There was a problem on create database, tenant removed.');
+
+            $this->info("Database created » {$tenant->db_name}");
+
+            $exitCode = $this->call('tenant:migrate', [
+                'tenant'  => $tenant->id,
+                '--fresh' => true,
+                '--seed'  => true
+            ]);
+
+            if ($exitCode === 1) {
+                DB::rollback();
+                $this->error('There was a problem on migrate.');
+
+                return 1;
             }
-            
-            $this->error($e->getMessage());
-            
+
+            DB::commit();
+
+            return $exitCode;
+        } catch (\Exception $th) {
+            DB::rollback();
+            $this->error($th->getMessage());
+
             return 1;
         }
-
-        $this->info("Database created » {$tenant->db_name}");
-
-        $exitCode = $this->call('tenant:migrate', [
-            'tenant' => $tenant->id,
-            '--fresh' => true,
-            '--seed' => true
-        ]);
-
-        if ($exitCode === 1 && isset($tenant)) {
-            $tenant->delete();
-            $this->info('There was a problem on migrate, tenant removed.');
-        }
-
-        return $exitCode;
     }
 }
