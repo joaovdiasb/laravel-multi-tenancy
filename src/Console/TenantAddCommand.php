@@ -44,7 +44,7 @@ class TenantAddCommand extends BaseCommand
             'name'        => 'required|string|between:3,128',
             'reference'   => 'required|string|unique:tenants|between:3,64',
             'db_host'     => 'nullable|string|between:1,128',
-            'db_port'     => 'nullable|integer|between:1,10000',
+            'db_port'     => 'nullable|integer|between:1,99999',
             'db_name'     => 'required|string|unique:tenants|between:3,128',
             'db_user'     => 'required|string|between:1,64',
             'db_password' => 'required|string',
