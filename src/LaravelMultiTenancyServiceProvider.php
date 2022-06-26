@@ -77,7 +77,7 @@ class LaravelMultiTenancyServiceProvider extends ServiceProvider
     {
         // Register facade
         $this->app->singleton('laravel-multi-tenancy', function () {
-            return new LaravelMultiTenancy;
+            return new LaravelMultiTenancyFacade();
         });
     }
 

@@ -45,7 +45,7 @@ abstract class Database
      */
     public static function create(?string $databaseType = null)
     {
-        $selectedDatabaseType = self::DATABASE_TYPES[$databaseType ?: strtolower(config('multitenancy.database'))] ?? null;
+        $selectedDatabaseType = self::DATABASE_TYPES[strtolower($databaseType ?: config('multitenancy.database'))] ?? null;
 
         if (empty($selectedDatabaseType)) {
             throw DatabaseException::invalidTypeConfig($selectedDatabaseType);
