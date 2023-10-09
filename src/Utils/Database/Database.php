@@ -18,6 +18,8 @@ abstract class Database
 
     protected int $timeout = 0;
 
+    protected string $socket = '';
+
     protected string $dumpBinaryPath = '';
 
     protected bool $compressor = false;
@@ -27,11 +29,13 @@ abstract class Database
     protected bool $onlyData = false;
 
     const DATABASE_TYPES = [
-        'mysql' => 'MySql'
+        'mysql' => 'MySql',
+        'pgsql' => 'Postgres',
     ];
 
     const DATABASE_DRIVERS = [
-        'mysql' => 'mysql'
+        'mysql' => 'mysql',
+        'pgsql' => 'pgsql'
     ];
 
     /**
